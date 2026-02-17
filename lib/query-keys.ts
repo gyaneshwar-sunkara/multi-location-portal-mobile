@@ -65,6 +65,7 @@ export const qk = {
   notificationsList: (params?: Record<string, unknown>) =>
     ["notifications", params] as const,
   notificationsUnread: ["notifications", "unread"] as const,
+  notificationsPreferences: ["notifications", "preferences"] as const,
 
   // Two-factor
   twoFactorStatus: ["two-factor", "status"] as const,

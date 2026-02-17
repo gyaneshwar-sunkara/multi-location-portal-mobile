@@ -327,5 +327,25 @@
     "light": "Claro",
     "dark": "Oscuro",
     "system": "Sistema"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "empty": "No hay notificaciones aún",
+    "emptyDescription": "Verás tus notificaciones aquí cuando lleguen.",
+    "markAsRead": "Marcar como leída",
+    "markAllRead": "Marcar todas como leídas",
+    "markAllReadSuccess": "Todas las notificaciones marcadas como leídas.",
+    "dismiss": "Descartar",
+    "new": "Nueva",
+    "preferences": "Preferencias de Notificaciones",
+    "preferencesDescription": "Elige qué notificaciones deseas recibir.",
+    "preferencesSaved": "Preferencias de notificaciones actualizadas.",
+    "emailNotifications": "Notificaciones por Correo",
+    "pushNotifications": "Notificaciones Push",
+    "channelSecurity": "Alertas de seguridad",
+    "channelOrganization": "Actualizaciones de la organización",
+    "channelMarketing": "Marketing y actualizaciones del producto",
+    "pushPermissionDenied": "Las notificaciones push están deshabilitadas. Habilítalas en la configuración de tu dispositivo.",
+    "pushPermissionSettings": "Abrir Configuración"
   }
 }

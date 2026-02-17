@@ -327,5 +327,25 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "emptyDescription": "You'll see your notifications here when they arrive.",
+    "markAsRead": "Mark as read",
+    "markAllRead": "Mark all as read",
+    "markAllReadSuccess": "All notifications marked as read.",
+    "dismiss": "Dismiss",
+    "new": "New",
+    "preferences": "Notification Preferences",
+    "preferencesDescription": "Choose which notifications you want to receive.",
+    "preferencesSaved": "Notification preferences updated.",
+    "emailNotifications": "Email Notifications",
+    "pushNotifications": "Push Notifications",
+    "channelSecurity": "Security alerts",
+    "channelOrganization": "Organization updates",
+    "channelMarketing": "Marketing & product updates",
+    "pushPermissionDenied": "Push notifications are disabled. Enable them in your device settings.",
+    "pushPermissionSettings": "Open Settings"
   }
 }

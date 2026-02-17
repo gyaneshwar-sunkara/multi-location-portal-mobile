@@ -2,11 +2,14 @@ import { Redirect, Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/providers/auth-provider';
 import { useAppTheme } from '@/providers/theme-provider';
+import { usePushNotifications } from '@/hooks/use-push-notifications';
 
 export default function AppLayout() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const { theme } = useAppTheme();
   const { t } = useTranslation();
+
+  usePushNotifications();
 
   if (isLoading) return null;
   if (!isAuthenticated) return <Redirect href="/(auth)/sign-in" />;
@@ -40,6 +43,10 @@ export default function AppLayout() {
       <Stack.Screen
         name="settings/theme"
         options={{ title: t('theme.label'), headerBackTitle: t('common.settings') }}
+      />
+      <Stack.Screen
+        name="settings/notification-preferences"
+        options={{ title: t('notifications.preferences'), headerBackTitle: t('common.settings') }}
       />
       <Stack.Screen
         name="org/members"

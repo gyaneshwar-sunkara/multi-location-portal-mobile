@@ -66,6 +66,12 @@ export default function SettingsScreen() {
           label: t('settings.password.title'),
           onPress: () => router.push('/(app)/settings/change-password'),
         },
+        {
+          key: 'notification-preferences',
+          icon: 'notifications-outline',
+          label: t('notifications.preferences'),
+          onPress: () => router.push('/(app)/settings/notification-preferences'),
+        },
       ],
     },
     {

@@ -327,5 +327,25 @@
     "light": "فاتح",
     "dark": "داكن",
     "system": "تلقائي"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "empty": "لا توجد إشعارات بعد",
+    "emptyDescription": "ستظهر إشعاراتك هنا عند وصولها.",
+    "markAsRead": "تحديد كمقروء",
+    "markAllRead": "تحديد الكل كمقروء",
+    "markAllReadSuccess": "تم تحديد جميع الإشعارات كمقروءة.",
+    "dismiss": "تجاهل",
+    "new": "جديد",
+    "preferences": "تفضيلات الإشعارات",
+    "preferencesDescription": "اختر الإشعارات التي تريد تلقيها.",
+    "preferencesSaved": "تم تحديث تفضيلات الإشعارات.",
+    "emailNotifications": "إشعارات البريد الإلكتروني",
+    "pushNotifications": "الإشعارات الفورية",
+    "channelSecurity": "تنبيهات الأمان",
+    "channelOrganization": "تحديثات المؤسسة",
+    "channelMarketing": "التسويق وتحديثات المنتج",
+    "pushPermissionDenied": "الإشعارات الفورية معطلة. فعّلها في إعدادات جهازك.",
+    "pushPermissionSettings": "فتح الإعدادات"
   }
 }

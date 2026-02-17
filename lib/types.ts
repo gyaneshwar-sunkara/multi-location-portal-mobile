@@ -94,6 +94,28 @@ export interface AdminStats {
   sessions: { active: number };
 }
 
+// ── Notification Types ──────────────────────────────────────────────────────
+
+export type NotificationType = 'SECURITY' | 'SYSTEM' | 'ORGANIZATION' | 'INVITATION';
+export type NotificationPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  priority: NotificationPriority;
+  title: string;
+  message: string | null;
+  actionUrl: string | null;
+  readAt: string | null;
+  dismissedAt: string | null;
+  createdAt: string;
+}
+
+export interface NotificationPreferences {
+  email: { security: boolean; organization: boolean; marketing: boolean };
+  push: { security: boolean; organization: boolean };
+}
+
 // ── Generic Utility Types ───────────────────────────────────────────────────
 
 export interface ActionResult {
