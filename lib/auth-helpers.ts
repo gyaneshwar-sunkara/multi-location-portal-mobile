@@ -1,0 +1,101 @@
+import { apiPublicFetch } from '@/lib/api-client.js';
+import { parseApiError } from '@/lib/api-error.js';
+import { useAuthStore } from '@/stores/auth-store.js';
+import type { AuthResponse, MeResponse } from '@/lib/types.js';
+
+/**
+ * Complete the authentication flow after login/register/2FA verify.
+ * Fetches /auth/me for memberships, then persists everything to auth store.
+ */
+export async function completeAuth(authResponse: AuthResponse): Promise<void> {
+  const meResponse = await apiPublicFetch('/auth/me', {
+    headers: { Authorization: `Bearer ${authResponse.accessToken}` },
+  });
+
+  let memberships: MeResponse['memberships'] = [];
+  let activeOrgId: string | null = null;
+
+  if (meResponse.ok) {
+    const me: MeResponse = await meResponse.json();
+    memberships = me.memberships ?? [];
+    const defaultOrgId = authResponse.user.defaultOrgId;
+    const isDefaultValid =
+      defaultOrgId && memberships.some((m) => m.organizationId === defaultOrgId);
+    activeOrgId = isDefaultValid
+      ? defaultOrgId
+      : (memberships[0]?.organizationId ?? null);
+  }
+
+  await useAuthStore.getState().setAuth(
+    authResponse.accessToken,
+    authResponse.refreshToken,
+    authResponse.user,
+    memberships,
+    activeOrgId,
+  );
+}
+
+// ── 2FA API Helpers ─────────────────────────────────────────────────────────
+
+export async function send2faOtp(
+  method: 'email' | 'sms',
+  challengeToken: string,
+): Promise<{ success?: boolean; error?: string }> {
+  const endpoint =
+    method === 'email'
+      ? '/auth/2fa/email-otp/send'
+      : '/auth/2fa/sms-otp/send';
+
+  const response = await apiPublicFetch(endpoint, {
+    method: 'POST',
+    body: JSON.stringify({ challengeToken }),
+  });
+
+  if (!response.ok) {
+    const error = await parseApiError(response, 'Failed to send code');
+    return { error };
+  }
+
+  return { success: true };
+}
+
+export async function verify2faCode(
+  method: 'totp' | 'email' | 'sms',
+  data: { challengeToken: string; code: string; trustDevice?: boolean },
+): Promise<{ auth?: AuthResponse; error?: string }> {
+  const endpointMap = {
+    totp: '/auth/2fa/totp/verify',
+    email: '/auth/2fa/email-otp/verify',
+    sms: '/auth/2fa/sms-otp/verify',
+  } as const;
+
+  const response = await apiPublicFetch(endpointMap[method], {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await parseApiError(response, 'Verification failed');
+    return { error };
+  }
+
+  const auth: AuthResponse = await response.json();
+  return { auth };
+}
+
+export async function verifyRecoveryCode(
+  data: { challengeToken: string; code: string },
+): Promise<{ auth?: AuthResponse; error?: string }> {
+  const response = await apiPublicFetch('/auth/2fa/recovery/verify', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await parseApiError(response, 'Verification failed');
+    return { error };
+  }
+
+  const auth: AuthResponse = await response.json();
+  return { auth };
+}
