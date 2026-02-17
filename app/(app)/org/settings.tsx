@@ -41,12 +41,8 @@ export default function OrgSettingsScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Guard: redirect non-admins
-  if (!isOrgAdmin) {
-    return <Redirect href="/(app)/(tabs)/dashboard" />;
-  }
-
   // ── Fetch org details ──────────────────────────────────────────────────
+  // Hooks must be called unconditionally — use `enabled` to skip the fetch
   const { data: org } = useQuery({
     queryKey: qk.organizationDetail(activeOrganizationId!),
     queryFn: async () => {
@@ -59,7 +55,7 @@ export default function OrgSettingsScreen() {
         status: string;
       }>;
     },
-    enabled: !!activeOrganizationId,
+    enabled: isOrgAdmin && !!activeOrganizationId,
   });
 
   // ── Form ───────────────────────────────────────────────────────────────
@@ -72,6 +68,11 @@ export default function OrgSettingsScreen() {
     defaultValues: { name: org?.name ?? activeMembership?.organizationName ?? '' },
     values: org ? { name: org.name } : undefined,
   });
+
+  // Guard: redirect non-admins (after all hooks)
+  if (!isOrgAdmin) {
+    return <Redirect href="/(app)/(tabs)/dashboard" />;
+  }
 
   async function onSubmit(data: UpdateOrgInput) {
     setServerError('');

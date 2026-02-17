@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/auth-store';
 import type { User } from '@/lib/types';
@@ -18,6 +18,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const activeOrganizationId = useAuthStore((s) => s.activeOrganizationId);
 
   useEffect(() => {
     useAuthStore.getState().hydrate();
@@ -29,6 +30,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       queryClient.clear();
     }
   }, [isHydrated, isAuthenticated, queryClient]);
+
+  // Clear stale query cache when active organization changes
+  const prevOrgIdRef = useRef(activeOrganizationId);
+  useEffect(() => {
+    if (prevOrgIdRef.current !== null && prevOrgIdRef.current !== activeOrganizationId) {
+      queryClient.removeQueries();
+    }
+    prevOrgIdRef.current = activeOrganizationId;
+  }, [activeOrganizationId, queryClient]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
