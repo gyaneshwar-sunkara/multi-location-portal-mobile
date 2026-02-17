@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { View, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '@/providers/theme-provider';
 import { useAuth } from '@/providers/auth-provider';
 import { useUIStore, type ColorSchemePreference, type Language } from '@/stores/ui-store';
-import { Text } from '@/components/ui';
+import { Text, OptionSheet } from '@/components/ui';
 
 type SettingsItem = {
   key: string;
@@ -40,17 +41,8 @@ export default function SettingsScreen() {
   const colorScheme = useUIStore((s) => s.colorScheme);
   const setColorScheme = useUIStore((s) => s.setColorScheme);
 
-  function cycleLanguage() {
-    const currentIndex = LANGUAGES.findIndex((l) => l.value === language);
-    const next = LANGUAGES[(currentIndex + 1) % LANGUAGES.length];
-    setLanguage(next.value);
-  }
-
-  function cycleTheme() {
-    const currentIndex = THEMES.findIndex((th) => th.value === colorScheme);
-    const next = THEMES[(currentIndex + 1) % THEMES.length];
-    setColorScheme(next.value);
-  }
+  const [languageSheetVisible, setLanguageSheetVisible] = useState(false);
+  const [themeSheetVisible, setThemeSheetVisible] = useState(false);
 
   const sections: { title: string; items: SettingsItem[] }[] = [
     {
@@ -82,14 +74,14 @@ export default function SettingsScreen() {
           icon: 'globe-outline',
           label: t('language.label'),
           value: t(`language.${language}`),
-          onPress: cycleLanguage,
+          onPress: () => setLanguageSheetVisible(true),
         },
         {
           key: 'theme',
           icon: 'color-palette-outline',
           label: t('theme.label'),
           value: t(`theme.${colorScheme}`),
-          onPress: cycleTheme,
+          onPress: () => setThemeSheetVisible(true),
         },
       ],
     },
@@ -202,6 +194,22 @@ export default function SettingsScreen() {
           </View>
         </View>
       ))}
+      <OptionSheet
+        visible={languageSheetVisible}
+        title={t('language.label')}
+        options={LANGUAGES.map((l) => ({ label: t(l.labelKey), value: l.value }))}
+        selectedValue={language}
+        onSelect={setLanguage}
+        onClose={() => setLanguageSheetVisible(false)}
+      />
+      <OptionSheet
+        visible={themeSheetVisible}
+        title={t('theme.label')}
+        options={THEMES.map((th) => ({ label: t(th.labelKey), value: th.value }))}
+        selectedValue={colorScheme}
+        onSelect={setColorScheme}
+        onClose={() => setThemeSheetVisible(false)}
+      />
     </ScrollView>
   );
 }

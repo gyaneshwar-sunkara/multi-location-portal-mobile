@@ -10,3 +10,4 @@ export {
   CardFooter,
 } from './Card';
 export { Label } from './Label';
+export { OptionSheet } from './OptionSheet';

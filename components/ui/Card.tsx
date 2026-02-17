@@ -3,6 +3,12 @@ import { View, type ViewProps } from 'react-native';
 import { useAppTheme } from '@/providers/theme-provider';
 import { Text } from './Text';
 
+function isTextContent(children: React.ReactNode): boolean {
+  if (typeof children === 'string' || typeof children === 'number') return true;
+  if (Array.isArray(children)) return children.every(isTextContent);
+  return false;
+}
+
 export function Card({ style, ...props }: ViewProps) {
   const { theme } = useAppTheme();
 
@@ -34,7 +40,7 @@ interface CardTextProps extends ViewProps {
 }
 
 export function CardTitle({ style, children, ...props }: CardTextProps) {
-  return typeof children === 'string' ? (
+  return isTextContent(children) ? (
     <Text variant="h3" style={style} {...(props as any)}>
       {children}
     </Text>
@@ -48,7 +54,7 @@ export function CardTitle({ style, children, ...props }: CardTextProps) {
 export function CardDescription({ style, children, ...props }: CardTextProps) {
   const { theme } = useAppTheme();
 
-  return typeof children === 'string' ? (
+  return isTextContent(children) ? (
     <Text variant="bodySmall" color={theme.colors.mutedForeground} style={style} {...(props as any)}>
       {children}
     </Text>
