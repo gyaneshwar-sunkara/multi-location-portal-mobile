@@ -1,8 +1,10 @@
 import { Stack } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useAppTheme } from '@/providers/theme-provider';
 
 export default function AuthLayout() {
   const { theme } = useAppTheme();
+  const { t } = useTranslation();
 
   return (
     <Stack
@@ -14,9 +16,38 @@ export default function AuthLayout() {
     >
       <Stack.Screen name="sign-in" />
       <Stack.Screen name="register" />
-      <Stack.Screen name="forgot-password" />
-      <Stack.Screen name="reset-password" />
-      <Stack.Screen name="verify-2fa" />
+      <Stack.Screen
+        name="forgot-password"
+        options={{
+          headerShown: true,
+          title: '',
+          headerBackTitle: t('auth.signIn'),
+          headerShadowVisible: false,
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerTintColor: theme.colors.foreground,
+        }}
+      />
+      <Stack.Screen
+        name="reset-password"
+        options={{
+          headerShown: true,
+          title: '',
+          headerShadowVisible: false,
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerTintColor: theme.colors.foreground,
+        }}
+      />
+      <Stack.Screen
+        name="verify-2fa"
+        options={{
+          headerShown: true,
+          title: '',
+          headerBackTitle: t('auth.signIn'),
+          headerShadowVisible: false,
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerTintColor: theme.colors.foreground,
+        }}
+      />
     </Stack>
   );
 }

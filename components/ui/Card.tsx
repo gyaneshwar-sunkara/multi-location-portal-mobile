@@ -21,9 +21,9 @@ export function Card({ style, ...props }: ViewProps) {
           borderRadius: theme.radii.xl,
           borderWidth: 1,
           borderColor: theme.colors.border,
-          gap: 24,
-          paddingVertical: 24,
-          ...theme.shadows.sm,
+          gap: theme.spacing.lg,
+          paddingVertical: theme.spacing.lg,
+          ...theme.shadows.md,
         },
         style,
       ]}
@@ -33,7 +33,8 @@ export function Card({ style, ...props }: ViewProps) {
 }
 
 export function CardHeader({ style, ...props }: ViewProps) {
-  return <View style={[{ paddingHorizontal: 24, gap: 8 }, style]} {...props} />;
+  const { theme } = useAppTheme();
+  return <View style={[{ paddingHorizontal: theme.spacing.lg, gap: theme.spacing.xs }, style]} {...props} />;
 }
 
 interface CardTextProps extends ViewProps {
@@ -67,13 +68,15 @@ export function CardDescription({ style, children, ...props }: CardTextProps) {
 }
 
 export function CardContent({ style, ...props }: ViewProps) {
-  return <View style={[{ paddingHorizontal: 24 }, style]} {...props} />;
+  const { theme } = useAppTheme();
+  return <View style={[{ paddingHorizontal: theme.spacing.lg }, style]} {...props} />;
 }
 
 export function CardFooter({ style, ...props }: ViewProps) {
+  const { theme } = useAppTheme();
   return (
     <View
-      style={[{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 24 }, style]}
+      style={[{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: theme.spacing.lg }, style]}
       {...props}
     />
   );

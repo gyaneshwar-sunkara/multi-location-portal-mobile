@@ -31,18 +31,19 @@ export function Input({ error, style, onFocus, onBlur, ...props }: InputProps) {
       }}
       style={[
         {
-          height: 44,
+          height: 48,
           borderWidth: 1,
           borderColor,
-          borderRadius: radii.md,
-          paddingHorizontal: 12,
+          borderRadius: radii.lg,
+          paddingHorizontal: 14,
           fontSize: 16,
           color: colors.foreground,
-          backgroundColor: 'transparent',
+          backgroundColor: colors.muted + '60',
         },
         focused && {
           borderWidth: 2,
-          paddingHorizontal: 11,
+          paddingHorizontal: 13,
+          backgroundColor: 'transparent',
         },
         Platform.OS === 'android' && { paddingVertical: 8 },
         style,

@@ -4,70 +4,46 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAppTheme } from '@/providers/theme-provider';
-import { useAuthStore } from '@/stores/auth-store';
+import { useUIStore, type ColorSchemePreference } from '@/stores/ui-store';
 import { Text } from '@/components/ui';
 
-const AVATAR_COLORS = [
-  '#6366F1', '#8B5CF6', '#EC4899', '#F43F5E',
-  '#F97316', '#EAB308', '#22C55E', '#14B8A6',
-  '#06B6D4', '#3B82F6',
+const THEMES: {
+  value: ColorSchemePreference;
+  labelKey: string;
+  descriptionKey: string;
+  icon: keyof typeof Ionicons.glyphMap;
+}[] = [
+  {
+    value: 'light',
+    labelKey: 'theme.light',
+    descriptionKey: 'settings.appearance.lightDescription',
+    icon: 'sunny-outline',
+  },
+  {
+    value: 'dark',
+    labelKey: 'theme.dark',
+    descriptionKey: 'settings.appearance.darkDescription',
+    icon: 'moon-outline',
+  },
+  {
+    value: 'system',
+    labelKey: 'theme.system',
+    descriptionKey: 'settings.appearance.systemDescription',
+    icon: 'phone-portrait-outline',
+  },
 ];
 
-function getOrgInitial(name: string): string {
-  return name.charAt(0).toUpperCase() || '?';
-}
-
-function getAvatarColor(name: string): string {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
-export default function OrgSwitchScreen() {
+export default function ThemeScreen() {
   const { t } = useTranslation();
   const { theme } = useAppTheme();
   const router = useRouter();
 
-  const memberships = useAuthStore((s) => s.memberships);
-  const activeOrganizationId = useAuthStore((s) => s.activeOrganizationId);
-  const setActiveOrganization = useAuthStore((s) => s.setActiveOrganization);
+  const colorScheme = useUIStore((s) => s.colorScheme);
+  const setColorScheme = useUIStore((s) => s.setColorScheme);
 
-  function handleSelect(orgId: string) {
-    setActiveOrganization(orgId);
+  function handleSelect(value: ColorSchemePreference) {
+    setColorScheme(value);
     router.back();
-  }
-
-  if (memberships.length === 0) {
-    return (
-      <View
-        style={[
-          styles.empty,
-          { backgroundColor: theme.colors.background, padding: theme.spacing.lg },
-        ]}
-      >
-        <View
-          style={[
-            styles.emptyIcon,
-            { backgroundColor: theme.colors.muted },
-          ]}
-        >
-          <Ionicons
-            name="business-outline"
-            size={32}
-            color={theme.colors.mutedForeground}
-          />
-        </View>
-        <Text
-          variant="bodySmall"
-          color={theme.colors.mutedForeground}
-          style={styles.textCenter}
-        >
-          {t('common.organizations')}
-        </Text>
-      </View>
-    );
   }
 
   return (
@@ -88,19 +64,17 @@ export default function OrgSwitchScreen() {
           },
         ]}
       >
-        {memberships.map((membership, index) => {
-          const isActive =
-            membership.organizationId === activeOrganizationId;
-          const avatarColor = getAvatarColor(membership.organizationName);
+        {THEMES.map((item, index) => {
+          const isActive = item.value === colorScheme;
 
           return (
             <Pressable
-              key={membership.organizationId}
-              onPress={() => handleSelect(membership.organizationId)}
+              key={item.value}
+              onPress={() => handleSelect(item.value)}
               style={({ pressed }) => [
                 styles.row,
                 { paddingHorizontal: theme.spacing.md },
-                index < memberships.length - 1 && {
+                index < THEMES.length - 1 && {
                   borderBottomWidth: StyleSheet.hairlineWidth,
                   borderBottomColor: theme.colors.border,
                 },
@@ -113,17 +87,23 @@ export default function OrgSwitchScreen() {
               <View style={[styles.rowLeft, { gap: theme.spacing.sm }]}>
                 <View
                   style={[
-                    styles.orgAvatar,
-                    { backgroundColor: avatarColor + '18' },
+                    styles.iconContainer,
+                    {
+                      backgroundColor: isActive
+                        ? theme.colors.primary + '12'
+                        : theme.colors.muted,
+                    },
                   ]}
                 >
-                  <Text
-                    variant="label"
-                    color={avatarColor}
-                    style={styles.orgInitial}
-                  >
-                    {getOrgInitial(membership.organizationName)}
-                  </Text>
+                  <Ionicons
+                    name={item.icon}
+                    size={18}
+                    color={
+                      isActive
+                        ? theme.colors.primary
+                        : theme.colors.mutedForeground
+                    }
+                  />
                 </View>
                 <View style={{ flex: 1, gap: 2 }}>
                   <Text
@@ -134,13 +114,13 @@ export default function OrgSwitchScreen() {
                         : theme.colors.foreground
                     }
                   >
-                    {membership.organizationName}
+                    {t(item.labelKey)}
                   </Text>
                   <Text
                     variant="caption"
                     color={theme.colors.mutedForeground}
                   >
-                    {membership.roleName}
+                    {t(item.descriptionKey)}
                   </Text>
                 </View>
               </View>
@@ -163,22 +143,6 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
   },
-  empty: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
-  },
-  emptyIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  textCenter: {
-    textAlign: 'center',
-  },
   card: {
     borderWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden',
@@ -195,15 +159,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  orgAvatar: {
+  iconContainer: {
     width: 40,
     height: 40,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  orgInitial: {
-    fontSize: 16,
-    fontWeight: '600',
   },
 });

@@ -461,21 +461,6 @@ export default function Verify2faScreen() {
         </View>
       )}
 
-      {/* Back to sign in */}
-      <Pressable
-        onPress={() => router.replace('/(auth)/sign-in')}
-        style={[styles.backLink, { marginTop: theme.spacing.lg }]}
-        hitSlop={8}
-      >
-        <Ionicons
-          name="arrow-back"
-          size={16}
-          color={theme.colors.mutedForeground}
-        />
-        <Text variant="bodySmall" color={theme.colors.mutedForeground}>
-          {t('auth.backToSignIn2fa')}
-        </Text>
-      </Pressable>
     </AuthScreenLayout>
   );
 }
@@ -520,13 +505,6 @@ const styles = StyleSheet.create({
   checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: 44,
-  },
-  backLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
     minHeight: 44,
   },
 });

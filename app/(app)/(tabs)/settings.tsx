@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -6,8 +6,11 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useAppTheme } from '@/providers/theme-provider';
 import { useAuth } from '@/providers/auth-provider';
-import { useUIStore, type ColorSchemePreference, type Language } from '@/stores/ui-store';
-import { Text, OptionSheet } from '@/components/ui';
+import { useAuthStore } from '@/stores/auth-store';
+import { useUIStore } from '@/stores/ui-store';
+import { Text } from '@/components/ui';
+import { getInitials } from '@/lib/format';
+import { meetsOrgHierarchy, isPlatformUser, ORG_HIERARCHY } from '@/lib/permissions';
 
 type SettingsItem = {
   key: string;
@@ -18,31 +21,24 @@ type SettingsItem = {
   destructive?: boolean;
 };
 
-const LANGUAGES: { value: Language; labelKey: string }[] = [
-  { value: 'en', labelKey: 'language.en' },
-  { value: 'es', labelKey: 'language.es' },
-  { value: 'ar', labelKey: 'language.ar' },
-];
-
-const THEMES: { value: ColorSchemePreference; labelKey: string }[] = [
-  { value: 'light', labelKey: 'theme.light' },
-  { value: 'dark', labelKey: 'theme.dark' },
-  { value: 'system', labelKey: 'theme.system' },
-];
-
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const { theme } = useAppTheme();
   const router = useRouter();
   const { user, logout } = useAuth();
 
-  const language = useUIStore((s) => s.language);
-  const setLanguage = useUIStore((s) => s.setLanguage);
-  const colorScheme = useUIStore((s) => s.colorScheme);
-  const setColorScheme = useUIStore((s) => s.setColorScheme);
+  const memberships = useAuthStore((s) => s.memberships);
+  const activeOrganizationId = useAuthStore((s) => s.activeOrganizationId);
+  const activeMembership = memberships.find(
+    (m) => m.organizationId === activeOrganizationId,
+  );
+  const isOrgAdmin = meetsOrgHierarchy(
+    activeMembership?.roleHierarchy,
+    ORG_HIERARCHY.ADMIN_LEVEL,
+  );
 
-  const [languageSheetVisible, setLanguageSheetVisible] = useState(false);
-  const [themeSheetVisible, setThemeSheetVisible] = useState(false);
+  const language = useUIStore((s) => s.language);
+  const colorScheme = useUIStore((s) => s.colorScheme);
 
   const sections: { title: string; items: SettingsItem[] }[] = [
     {
@@ -55,7 +51,7 @@ export default function SettingsScreen() {
           value: user
             ? [user.firstName, user.lastName].filter(Boolean).join(' ')
             : undefined,
-          onPress: () => {},
+          onPress: () => router.push('/(app)/settings/profile'),
         },
         {
           key: 'email',
@@ -63,6 +59,12 @@ export default function SettingsScreen() {
           label: t('settings.email.title'),
           value: user?.email ?? undefined,
           onPress: () => {},
+        },
+        {
+          key: 'change-password',
+          icon: 'lock-closed-outline',
+          label: t('settings.password.title'),
+          onPress: () => router.push('/(app)/settings/change-password'),
         },
       ],
     },
@@ -74,20 +76,36 @@ export default function SettingsScreen() {
           icon: 'globe-outline',
           label: t('language.label'),
           value: t(`language.${language}`),
-          onPress: () => setLanguageSheetVisible(true),
+          onPress: () => router.push('/(app)/settings/language'),
         },
         {
           key: 'theme',
           icon: 'color-palette-outline',
           label: t('theme.label'),
           value: t(`theme.${colorScheme}`),
-          onPress: () => setThemeSheetVisible(true),
+          onPress: () => router.push('/(app)/settings/theme'),
         },
       ],
     },
     {
       title: t('common.organizations'),
       items: [
+        {
+          key: 'members',
+          icon: 'people-outline',
+          label: t('org.members'),
+          onPress: () => router.push('/(app)/org/members'),
+        },
+        ...(isOrgAdmin
+          ? [
+              {
+                key: 'org-settings',
+                icon: 'business-outline' as const,
+                label: t('org.settings'),
+                onPress: () => router.push('/(app)/org/settings'),
+              },
+            ]
+          : []),
         {
           key: 'org-switch',
           icon: 'swap-horizontal-outline',
@@ -96,9 +114,31 @@ export default function SettingsScreen() {
         },
       ],
     },
+    ...(isPlatformUser(user?.platformRole)
+      ? [
+          {
+            title: t('admin.title'),
+            items: [
+              {
+                key: 'admin-dashboard',
+                icon: 'stats-chart-outline' as keyof typeof Ionicons.glyphMap,
+                label: t('admin.title'),
+                onPress: () => router.push('/(app)/admin/dashboard'),
+              },
+            ],
+          },
+        ]
+      : []),
     {
       title: t('common.account'),
       items: [
+        {
+          key: 'delete-account',
+          icon: 'trash-outline',
+          label: t('settings.danger.deleteAccount'),
+          onPress: () => router.push('/(app)/settings/delete-account'),
+          destructive: true,
+        },
         {
           key: 'sign-out',
           icon: 'log-out-outline',
@@ -110,14 +150,45 @@ export default function SettingsScreen() {
     },
   ];
 
+  const fullName = user
+    ? [user.firstName, user.lastName].filter(Boolean).join(' ')
+    : undefined;
+
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       contentContainerStyle={[
         styles.container,
-        { padding: theme.spacing.lg, gap: theme.spacing.xl },
+        { padding: theme.spacing.lg, gap: theme.spacing.lg },
       ]}
     >
+      {/* User Profile Header */}
+      <View style={[styles.profileCard, { gap: theme.spacing.md }]}>
+        <View
+          style={[
+            styles.avatar,
+            { backgroundColor: theme.colors.primary },
+          ]}
+        >
+          <Text
+            variant="h2"
+            color={theme.colors.primaryForeground}
+            style={styles.avatarText}
+          >
+            {getInitials(user?.firstName, user?.lastName)}
+          </Text>
+        </View>
+        <View style={styles.profileInfo}>
+          {fullName && <Text variant="h3">{fullName}</Text>}
+          {user?.email && (
+            <Text variant="bodySmall" color={theme.colors.mutedForeground}>
+              {user.email}
+            </Text>
+          )}
+        </View>
+      </View>
+
+      {/* Settings Sections */}
       {sections.map((section) => (
         <View key={section.title} style={{ gap: theme.spacing.xs }}>
           <Text
@@ -152,15 +223,26 @@ export default function SettingsScreen() {
                 ]}
               >
                 <View style={[styles.rowLeft, { gap: theme.spacing.sm }]}>
-                  <Ionicons
-                    name={item.icon}
-                    size={20}
-                    color={
-                      item.destructive
-                        ? theme.colors.destructive
-                        : theme.colors.mutedForeground
-                    }
-                  />
+                  <View
+                    style={[
+                      styles.rowIcon,
+                      {
+                        backgroundColor: item.destructive
+                          ? theme.colors.destructive + '12'
+                          : theme.colors.muted,
+                      },
+                    ]}
+                  >
+                    <Ionicons
+                      name={item.icon}
+                      size={18}
+                      color={
+                        item.destructive
+                          ? theme.colors.destructive
+                          : theme.colors.mutedForeground
+                      }
+                    />
+                  </View>
                   <Text
                     variant="body"
                     color={
@@ -175,8 +257,10 @@ export default function SettingsScreen() {
                 <View style={[styles.rowRight, { gap: theme.spacing.xs }]}>
                   {item.value && (
                     <Text
-                      variant="bodySmall"
+                      variant="caption"
                       color={theme.colors.mutedForeground}
+                      numberOfLines={1}
+                      style={styles.rowValue}
                     >
                       {item.value}
                     </Text>
@@ -194,22 +278,6 @@ export default function SettingsScreen() {
           </View>
         </View>
       ))}
-      <OptionSheet
-        visible={languageSheetVisible}
-        title={t('language.label')}
-        options={LANGUAGES.map((l) => ({ label: t(l.labelKey), value: l.value }))}
-        selectedValue={language}
-        onSelect={setLanguage}
-        onClose={() => setLanguageSheetVisible(false)}
-      />
-      <OptionSheet
-        visible={themeSheetVisible}
-        title={t('theme.label')}
-        options={THEMES.map((th) => ({ label: t(th.labelKey), value: th.value }))}
-        selectedValue={colorScheme}
-        onSelect={setColorScheme}
-        onClose={() => setThemeSheetVisible(false)}
-      />
     </ScrollView>
   );
 }
@@ -217,6 +285,25 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
+  },
+  profileCard: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  avatar: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: {
+    fontSize: 28,
+    lineHeight: 34,
+  },
+  profileInfo: {
+    alignItems: 'center',
+    gap: 2,
   },
   sectionTitle: {
     paddingHorizontal: 4,
@@ -230,16 +317,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: 48,
-    paddingVertical: 12,
+    minHeight: 52,
+    paddingVertical: 10,
   },
   rowLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
+  rowIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   rowRight: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  rowValue: {
+    maxWidth: 120,
   },
 });

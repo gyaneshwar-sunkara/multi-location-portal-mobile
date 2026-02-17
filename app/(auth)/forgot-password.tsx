@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Pressable, StyleSheet } from 'react-native';
-import { Link } from 'expo-router';
+import { View, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useAppTheme } from '@/providers/theme-provider';
 import { AuthScreenLayout } from '@/components/auth/AuthScreenLayout';
+import { BrandHeader } from '@/components/auth/BrandHeader';
 import { Text, Button, Input, Label } from '@/components/ui';
 import {
   forgotPasswordSchema,
@@ -19,6 +20,7 @@ import { parseApiError } from '@/lib/api-error';
 export default function ForgotPasswordScreen() {
   const { t } = useTranslation();
   const { theme } = useAppTheme();
+  const router = useRouter();
   const [emailSent, setEmailSent] = useState(false);
   const [serverError, setServerError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -43,7 +45,7 @@ export default function ForgotPasswordScreen() {
       });
 
       if (!response.ok) {
-        const error = await parseApiError(response);
+        const error = await parseApiError(response, t('errorState.genericDescription'));
         setServerError(error);
         return;
       }
@@ -93,21 +95,14 @@ export default function ForgotPasswordScreen() {
             {t('auth.checkSpamFolder')}
           </Text>
 
-          <Link href="/(auth)/sign-in" asChild>
-            <Pressable
-              style={[styles.backLink, { marginTop: theme.spacing.md }]}
-              hitSlop={8}
-            >
-              <Ionicons
-                name="arrow-back"
-                size={16}
-                color={theme.colors.primary}
-              />
-              <Text variant="bodySmall" color={theme.colors.primary}>
-                {t('auth.backToSignIn')}
-              </Text>
-            </Pressable>
-          </Link>
+          <Button
+            variant="outline"
+            size="lg"
+            onPress={() => router.replace('/(auth)/sign-in')}
+            style={{ marginTop: theme.spacing.sm, alignSelf: 'stretch' }}
+          >
+            {t('auth.backToSignIn')}
+          </Button>
         </View>
       </AuthScreenLayout>
     );
@@ -115,6 +110,8 @@ export default function ForgotPasswordScreen() {
 
   return (
     <AuthScreenLayout>
+      <BrandHeader />
+
       <View style={{ gap: theme.spacing.sm }}>
         <Text variant="h2">{t('auth.forgotPasswordTitle')}</Text>
         <Text variant="bodySmall" color={theme.colors.mutedForeground}>
@@ -171,22 +168,6 @@ export default function ForgotPasswordScreen() {
           {t('auth.sendResetLink')}
         </Button>
       </View>
-
-      <Link href="/(auth)/sign-in" asChild>
-        <Pressable
-          style={[styles.backLink, { marginTop: theme.spacing.lg }]}
-          hitSlop={8}
-        >
-          <Ionicons
-            name="arrow-back"
-            size={16}
-            color={theme.colors.primary}
-          />
-          <Text variant="bodySmall" color={theme.colors.primary}>
-            {t('auth.backToSignIn')}
-          </Text>
-        </Pressable>
-      </Link>
     </AuthScreenLayout>
   );
 }
@@ -207,12 +188,5 @@ const styles = StyleSheet.create({
   },
   errorBanner: {
     padding: 12,
-  },
-  backLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    minHeight: 44,
   },
 });

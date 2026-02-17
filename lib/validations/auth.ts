@@ -1,5 +1,16 @@
 import { z } from "zod"
 
+/**
+ * Password requirement rules for the inline strength indicator UI.
+ * Keys correspond to i18n keys: `auth.passwordRequirements.{key}`.
+ */
+export const PASSWORD_REQUIREMENTS = [
+  { key: 'length', regex: /.{8,}/ },
+  { key: 'uppercase', regex: /[A-Z]/ },
+  { key: 'lowercase', regex: /[a-z]/ },
+  { key: 'number', regex: /[0-9]/ },
+] as const
+
 export const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
@@ -17,8 +28,8 @@ export const registerSchema = z.object({
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[0-9]/, "Password must contain at least one number"),
-  terms: z.literal(true, {
-    error: "You must accept the terms and conditions",
+  terms: z.boolean().refine((v) => v === true, {
+    message: "You must accept the terms and conditions",
   }),
 })
 

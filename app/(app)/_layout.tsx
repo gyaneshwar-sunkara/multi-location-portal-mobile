@@ -4,7 +4,7 @@ import { useAuth } from '@/providers/auth-provider';
 import { useAppTheme } from '@/providers/theme-provider';
 
 export default function AppLayout() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const { theme } = useAppTheme();
   const { t } = useTranslation();
 
@@ -13,6 +13,7 @@ export default function AppLayout() {
 
   return (
     <Stack
+      key={user?.id}
       screenOptions={{
         contentStyle: { backgroundColor: theme.colors.background },
         headerStyle: { backgroundColor: theme.colors.card },
@@ -21,11 +22,44 @@ export default function AppLayout() {
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
+        name="settings/profile"
+        options={{ title: t('settings.profile.title'), headerBackTitle: t('common.settings') }}
+      />
+      <Stack.Screen
+        name="settings/change-password"
+        options={{ title: t('settings.password.title'), headerBackTitle: t('common.settings') }}
+      />
+      <Stack.Screen
+        name="settings/delete-account"
+        options={{ title: t('settings.danger.deleteTitle'), headerBackTitle: t('common.settings') }}
+      />
+      <Stack.Screen
+        name="settings/language"
+        options={{ title: t('language.label'), headerBackTitle: t('common.settings') }}
+      />
+      <Stack.Screen
+        name="settings/theme"
+        options={{ title: t('theme.label'), headerBackTitle: t('common.settings') }}
+      />
+      <Stack.Screen
+        name="org/members"
+        options={{ title: t('org.members'), headerBackTitle: t('common.settings') }}
+      />
+      <Stack.Screen
+        name="org/invite"
+        options={{ title: t('org.inviteMember'), presentation: 'modal' }}
+      />
+      <Stack.Screen
+        name="org/settings"
+        options={{ title: t('org.settings'), headerBackTitle: t('common.settings') }}
+      />
+      <Stack.Screen
         name="org/switch"
-        options={{
-          title: t('common.switchOrganization'),
-          presentation: 'modal',
-        }}
+        options={{ title: t('common.switchOrganization'), headerBackTitle: t('common.settings') }}
+      />
+      <Stack.Screen
+        name="admin/dashboard"
+        options={{ title: t('admin.title'), headerBackTitle: t('common.settings') }}
       />
     </Stack>
   );

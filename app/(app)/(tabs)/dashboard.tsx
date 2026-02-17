@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
 
 import { useAppTheme } from '@/providers/theme-provider';
 import { useAuthStore } from '@/stores/auth-store';
@@ -20,6 +21,7 @@ import {
   CardContent,
 } from '@/components/ui';
 import { apiFetch } from '@/lib/api-client';
+import { getInitials } from '@/lib/format';
 import { qk } from '@/lib/query-keys';
 import type { MeResponse } from '@/lib/types';
 
@@ -80,6 +82,11 @@ export default function DashboardScreen() {
     );
   }
 
+  const firstName = me?.firstName ?? user?.firstName;
+  const lastName = me?.lastName ?? user?.lastName;
+  const email = me?.email ?? user?.email;
+  const orgCount = (me?.memberships ?? memberships).length;
+
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.colors.background }}
@@ -91,39 +98,95 @@ export default function DashboardScreen() {
         <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
       }
     >
-      {/* Greeting */}
-      <View style={{ gap: theme.spacing.xs }}>
-        <Text variant="h2">
-          {t('dashboard.welcome', { name: user?.firstName ?? '' })}
-        </Text>
-        <Text variant="bodySmall" color={theme.colors.mutedForeground}>
-          {t('dashboard.description')}
-        </Text>
+      {/* Profile Header */}
+      <View style={[styles.profileHeader, { gap: theme.spacing.md }]}>
+        <View
+          style={[
+            styles.avatar,
+            { backgroundColor: theme.colors.primary },
+          ]}
+        >
+          <Text
+            variant="h2"
+            color={theme.colors.primaryForeground}
+            style={styles.avatarText}
+          >
+            {getInitials(firstName, lastName)}
+          </Text>
+        </View>
+        <View style={[styles.profileInfo, { gap: theme.spacing.xs }]}>
+          <Text variant="h2">
+            {t('dashboard.welcome', { name: firstName ?? '' })}
+          </Text>
+          <Text variant="bodySmall" color={theme.colors.mutedForeground}>
+            {t('dashboard.description')}
+          </Text>
+        </View>
       </View>
 
       {/* Active Organization */}
       {activeOrg && (
         <Card>
           <CardHeader>
-            <CardTitle>{activeOrg.organizationName}</CardTitle>
-            <CardDescription>
-              {`${activeOrg.roleName} · ${activeOrg.organizationSlug}`}
-            </CardDescription>
+            <View style={[styles.cardHeaderRow, { gap: theme.spacing.sm }]}>
+              <View
+                style={[
+                  styles.cardIcon,
+                  { backgroundColor: theme.colors.primary + '12' },
+                ]}
+              >
+                <Ionicons
+                  name="business"
+                  size={18}
+                  color={theme.colors.primary}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <CardTitle>{activeOrg.organizationName}</CardTitle>
+                <CardDescription>{activeOrg.roleName}</CardDescription>
+              </View>
+            </View>
           </CardHeader>
           <CardContent>
-            <View style={{ gap: theme.spacing.xs }}>
-              <View style={styles.statRow}>
+            <View
+              style={[
+                styles.infoRow,
+                {
+                  borderBottomWidth: StyleSheet.hairlineWidth,
+                  borderBottomColor: theme.colors.border,
+                  paddingBottom: theme.spacing.sm,
+                },
+              ]}
+            >
+              <View style={[styles.infoLabel, { gap: theme.spacing.xs }]}>
+                <Ionicons
+                  name="link-outline"
+                  size={16}
+                  color={theme.colors.mutedForeground}
+                />
                 <Text variant="bodySmall" color={theme.colors.mutedForeground}>
-                  {t('auth.organization')}
+                  {t('common.slug')}
                 </Text>
-                <Text variant="body">{activeOrg.organizationName}</Text>
               </View>
-              <View style={styles.statRow}>
+              <Text variant="bodySmall">{activeOrg.organizationSlug}</Text>
+            </View>
+            <View
+              style={[
+                styles.infoRow,
+                { paddingTop: theme.spacing.sm },
+              ]}
+            >
+              <View style={[styles.infoLabel, { gap: theme.spacing.xs }]}>
+                <Ionicons
+                  name="shield-checkmark-outline"
+                  size={16}
+                  color={theme.colors.mutedForeground}
+                />
                 <Text variant="bodySmall" color={theme.colors.mutedForeground}>
                   {t('auth.assignedRole')}
                 </Text>
-                <Text variant="body">{activeOrg.roleName}</Text>
               </View>
+              <Text variant="bodySmall">{activeOrg.roleName}</Text>
             </View>
           </CardContent>
         </Card>
@@ -132,34 +195,91 @@ export default function DashboardScreen() {
       {/* Account Info */}
       <Card>
         <CardHeader>
-          <CardTitle>{t('settings.profile.title')}</CardTitle>
+          <View style={[styles.cardHeaderRow, { gap: theme.spacing.sm }]}>
+            <View
+              style={[
+                styles.cardIcon,
+                { backgroundColor: theme.colors.primary + '12' },
+              ]}
+            >
+              <Ionicons
+                name="person"
+                size={18}
+                color={theme.colors.primary}
+              />
+            </View>
+            <CardTitle>{t('settings.profile.title')}</CardTitle>
+          </View>
         </CardHeader>
         <CardContent>
-          <View style={{ gap: theme.spacing.xs }}>
-            <View style={styles.statRow}>
-              <Text variant="bodySmall" color={theme.colors.mutedForeground}>
-                {t('auth.emailAddress')}
-              </Text>
-              <Text variant="body">{me?.email ?? user?.email}</Text>
-            </View>
-            {(me?.firstName ?? user?.firstName) && (
-              <View style={styles.statRow}>
+          <View style={{ gap: 0 }}>
+            <View
+              style={[
+                styles.infoRow,
+                {
+                  borderBottomWidth: StyleSheet.hairlineWidth,
+                  borderBottomColor: theme.colors.border,
+                  paddingBottom: theme.spacing.sm,
+                },
+              ]}
+            >
+              <View style={[styles.infoLabel, { gap: theme.spacing.xs }]}>
+                <Ionicons
+                  name="mail-outline"
+                  size={16}
+                  color={theme.colors.mutedForeground}
+                />
                 <Text variant="bodySmall" color={theme.colors.mutedForeground}>
-                  {t('auth.firstName')}
+                  {t('auth.emailAddress')}
                 </Text>
-                <Text variant="body">
-                  {me?.firstName ?? user?.firstName}{' '}
-                  {me?.lastName ?? user?.lastName}
+              </View>
+              <Text variant="bodySmall" style={styles.infoValue}>
+                {email}
+              </Text>
+            </View>
+            {firstName && (
+              <View
+                style={[
+                  styles.infoRow,
+                  {
+                    borderBottomWidth: StyleSheet.hairlineWidth,
+                    borderBottomColor: theme.colors.border,
+                    paddingVertical: theme.spacing.sm,
+                  },
+                ]}
+              >
+                <View style={[styles.infoLabel, { gap: theme.spacing.xs }]}>
+                  <Ionicons
+                    name="person-outline"
+                    size={16}
+                    color={theme.colors.mutedForeground}
+                  />
+                  <Text variant="bodySmall" color={theme.colors.mutedForeground}>
+                    {t('auth.firstName')}
+                  </Text>
+                </View>
+                <Text variant="bodySmall">
+                  {firstName} {lastName}
                 </Text>
               </View>
             )}
-            <View style={styles.statRow}>
-              <Text variant="bodySmall" color={theme.colors.mutedForeground}>
-                {t('common.organizations')}
-              </Text>
-              <Text variant="body">
-                {(me?.memberships ?? memberships).length}
-              </Text>
+            <View
+              style={[
+                styles.infoRow,
+                { paddingTop: theme.spacing.sm },
+              ]}
+            >
+              <View style={[styles.infoLabel, { gap: theme.spacing.xs }]}>
+                <Ionicons
+                  name="people-outline"
+                  size={16}
+                  color={theme.colors.mutedForeground}
+                />
+                <Text variant="bodySmall" color={theme.colors.mutedForeground}>
+                  {t('common.organizations')}
+                </Text>
+              </View>
+              <Text variant="bodySmall">{orgCount}</Text>
             </View>
           </View>
         </CardContent>
@@ -177,10 +297,46 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
   },
-  statRow: {
+  profileHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: {
+    fontSize: 22,
+    lineHeight: 28,
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  cardHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cardIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    minHeight: 32,
+    minHeight: 36,
+  },
+  infoLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  infoValue: {
+    flexShrink: 1,
   },
 });

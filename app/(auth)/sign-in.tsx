@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useAppTheme } from '@/providers/theme-provider';
 import { AuthScreenLayout } from '@/components/auth/AuthScreenLayout';
+import { BrandHeader } from '@/components/auth/BrandHeader';
 import { PasswordInput } from '@/components/auth/PasswordInput';
 import { Text, Button, Input, Label } from '@/components/ui';
 import { loginSchema, type LoginInput } from '@/lib/validations/auth';
@@ -71,6 +72,8 @@ export default function SignInScreen() {
 
   return (
     <AuthScreenLayout>
+      <BrandHeader />
+
       <View style={{ gap: theme.spacing.sm }}>
         <Text variant="h2">{t('auth.welcomeBack')}</Text>
         <Text variant="bodySmall" color={theme.colors.mutedForeground}>

@@ -53,6 +53,47 @@ export function isTwoFactorChallenge(
   return 'requiresTwoFactor' in response && response.requiresTwoFactor === true;
 }
 
+// ── Organization Types ──────────────────────────────────────────────────────
+
+export interface OrgMember {
+  id: string;
+  userId: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  avatarUrl: string | null;
+  roleId: string;
+  roleName: string;
+  roleSlug: string;
+  status: string;
+  joinedAt: string | null;
+}
+
+export interface OrgRole {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  isSystem: boolean;
+}
+
+export interface OrgInvitation {
+  id: string;
+  email: string;
+  roleName: string;
+  status: string;
+  expiresAt: string;
+  createdAt: string;
+}
+
+// ── Admin Types ─────────────────────────────────────────────────────────────
+
+export interface AdminStats {
+  users: { total: number; active: number; verified: number; with2FA: number; deleted: number };
+  organizations: { total: number; active: number; suspended: number; pending: number };
+  sessions: { active: number };
+}
+
 // ── Generic Utility Types ───────────────────────────────────────────────────
 
 export interface ActionResult {

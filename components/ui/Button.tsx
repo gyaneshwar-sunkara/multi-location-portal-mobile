@@ -27,7 +27,7 @@ function getVariantStyles(
 ): { container: ViewStyle; text: TextStyle } {
   const { colors, radii } = theme;
   const base: ViewStyle = {
-    borderRadius: radii.md,
+    borderRadius: radii.lg,
     alignItems: 'center',
     justifyContent: 'center',
   };
@@ -81,7 +81,7 @@ function getSizeStyles(size: ButtonSize): { container: ViewStyle; text: TextStyl
     case 'lg':
       return {
         container: { height: 52, paddingHorizontal: 24 },
-        text: { fontSize: 17 },
+        text: { fontSize: 17, fontWeight: '600' },
       };
   }
 }

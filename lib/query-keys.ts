@@ -101,6 +101,9 @@ export const qk = {
   impersonationSessionsList: (params?: Record<string, unknown>) =>
     ["impersonation-sessions", params] as const,
 
+  // Admin - Stats
+  adminStats: ["admin-stats"] as const,
+
   // SSO Config
   ssoConfig: ["sso-config"] as const,
 } as const

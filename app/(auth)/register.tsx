@@ -8,20 +8,18 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useAppTheme } from '@/providers/theme-provider';
 import { AuthScreenLayout } from '@/components/auth/AuthScreenLayout';
+import { BrandHeader } from '@/components/auth/BrandHeader';
 import { PasswordInput } from '@/components/auth/PasswordInput';
 import { Text, Button, Input, Label } from '@/components/ui';
-import { registerSchema, type RegisterInput } from '@/lib/validations/auth';
+import {
+  registerSchema,
+  type RegisterInput,
+  PASSWORD_REQUIREMENTS,
+} from '@/lib/validations/auth';
 import { apiPublicFetch } from '@/lib/api-client';
 import { parseApiError } from '@/lib/api-error';
 import { completeAuth } from '@/lib/auth-helpers';
 import type { AuthResponse } from '@/lib/types';
-
-const PASSWORD_REQUIREMENTS = [
-  { key: 'length', regex: /.{8,}/ },
-  { key: 'uppercase', regex: /[A-Z]/ },
-  { key: 'lowercase', regex: /[a-z]/ },
-  { key: 'number', regex: /[0-9]/ },
-] as const;
 
 export default function RegisterScreen() {
   const { t } = useTranslation();
@@ -42,7 +40,7 @@ export default function RegisterScreen() {
       lastName: '',
       email: '',
       password: '',
-      terms: false as unknown as true,
+      terms: false,
     },
   });
 
@@ -79,6 +77,8 @@ export default function RegisterScreen() {
 
   return (
     <AuthScreenLayout>
+      <BrandHeader />
+
       <View style={{ gap: theme.spacing.sm }}>
         <Text variant="h2">{t('auth.createAccount')}</Text>
         <Text variant="bodySmall" color={theme.colors.mutedForeground}>

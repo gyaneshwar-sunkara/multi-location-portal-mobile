@@ -2,7 +2,7 @@ import { z } from "zod"
 
 export const updateProfileSchema = z.object({
   firstName: z.string().min(1, "First name is required").max(50),
-  lastName: z.string().max(50).optional().default(""),
+  lastName: z.string().max(50),
 })
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>

@@ -40,9 +40,9 @@ export function OptionSheet<T>({
             styles.sheet,
             {
               backgroundColor: theme.colors.card,
-              borderTopLeftRadius: theme.radii.xl,
-              borderTopRightRadius: theme.radii.xl,
-              paddingBottom: insets.bottom + 16,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              paddingBottom: insets.bottom + 20,
             },
           ]}
           // Prevent taps inside the sheet from closing it
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   sheet: {
-    gap: 8,
+    gap: 12,
   },
   handleRow: {
     alignItems: 'center',
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: 48,
-    paddingVertical: 12,
+    minHeight: 52,
+    paddingVertical: 14,
   },
 });

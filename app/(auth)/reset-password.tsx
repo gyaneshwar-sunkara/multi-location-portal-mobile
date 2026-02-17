@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Pressable, StyleSheet } from 'react-native';
-import { useLocalSearchParams, useRouter, Link } from 'expo-router';
+import { View, StyleSheet } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
@@ -9,17 +9,12 @@ import { z } from 'zod';
 
 import { useAppTheme } from '@/providers/theme-provider';
 import { AuthScreenLayout } from '@/components/auth/AuthScreenLayout';
+import { BrandHeader } from '@/components/auth/BrandHeader';
 import { PasswordInput } from '@/components/auth/PasswordInput';
 import { Text, Button } from '@/components/ui';
 import { apiPublicFetch } from '@/lib/api-client';
 import { parseApiError } from '@/lib/api-error';
-
-const PASSWORD_REQUIREMENTS = [
-  { key: 'length', regex: /.{8,}/ },
-  { key: 'uppercase', regex: /[A-Z]/ },
-  { key: 'lowercase', regex: /[a-z]/ },
-  { key: 'number', regex: /[0-9]/ },
-] as const;
+import { PASSWORD_REQUIREMENTS } from '@/lib/validations/auth';
 
 const resetFormSchema = z.object({
   password: z
@@ -64,7 +59,7 @@ export default function ResetPasswordScreen() {
       });
 
       if (!response.ok) {
-        const error = await parseApiError(response);
+        const error = await parseApiError(response, t('errorState.genericDescription'));
         setServerError(error);
         return;
       }
@@ -97,13 +92,14 @@ export default function ResetPasswordScreen() {
           <Text variant="h3" style={styles.textCenter}>
             {t('auth.invalidResetToken')}
           </Text>
-          <Link href="/(auth)/forgot-password" asChild>
-            <Pressable style={styles.link} hitSlop={8}>
-              <Text variant="bodySmall" color={theme.colors.primary}>
-                {t('auth.requestNewLink')}
-              </Text>
-            </Pressable>
-          </Link>
+          <Button
+            variant="outline"
+            size="lg"
+            onPress={() => router.replace('/(auth)/forgot-password')}
+            style={{ marginTop: theme.spacing.sm, alignSelf: 'stretch' }}
+          >
+            {t('auth.requestNewLink')}
+          </Button>
         </View>
       </AuthScreenLayout>
     );
@@ -151,6 +147,8 @@ export default function ResetPasswordScreen() {
   // Form state
   return (
     <AuthScreenLayout>
+      <BrandHeader />
+
       <View style={{ gap: theme.spacing.sm }}>
         <Text variant="h2">{t('auth.resetPasswordTitle')}</Text>
         <Text variant="bodySmall" color={theme.colors.mutedForeground}>
@@ -235,22 +233,6 @@ export default function ResetPasswordScreen() {
           {t('auth.resetPassword')}
         </Button>
       </View>
-
-      <Link href="/(auth)/sign-in" asChild>
-        <Pressable
-          style={[styles.backLink, { marginTop: theme.spacing.lg }]}
-          hitSlop={8}
-        >
-          <Ionicons
-            name="arrow-back"
-            size={16}
-            color={theme.colors.primary}
-          />
-          <Text variant="bodySmall" color={theme.colors.primary}>
-            {t('auth.backToSignIn')}
-          </Text>
-        </Pressable>
-      </Link>
     </AuthScreenLayout>
   );
 }
@@ -279,16 +261,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-  },
-  link: {
-    minHeight: 44,
-    justifyContent: 'center',
-  },
-  backLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    minHeight: 44,
   },
 });
