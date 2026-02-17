@@ -1,24 +1,47 @@
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import '@/i18n';
 import 'react-native-reanimated';
 
+import { useEffect } from 'react';
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+
+import { useAuthStore } from '@/stores/auth-store';
+import { QueryProvider } from '@/providers/query-provider';
 import { AppThemeProvider } from '@/providers/theme-provider';
+import { AuthProvider } from '@/providers/auth-provider';
 
 export { ErrorBoundary } from 'expo-router';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  return (
+    <QueryProvider>
+      <AppThemeProvider>
+        <AuthProvider>
+          <RootNavigator />
+        </AuthProvider>
+      </AppThemeProvider>
+    </QueryProvider>
+  );
+}
+
+function RootNavigator() {
+  const isHydrated = useAuthStore((s) => s.isHydrated);
+
   useEffect(() => {
-    SplashScreen.hideAsync();
-  }, []);
+    if (isHydrated) {
+      SplashScreen.hideAsync();
+    }
+  }, [isHydrated]);
+
+  if (!isHydrated) return null;
 
   return (
-    <AppThemeProvider>
-      <Stack>
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </AppThemeProvider>
+    <Stack>
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="(app)" options={{ headerShown: false }} />
+      <Stack.Screen name="+not-found" />
+    </Stack>
   );
 }
