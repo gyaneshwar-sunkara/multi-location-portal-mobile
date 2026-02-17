@@ -1,4 +1,10 @@
-import { View, StyleSheet, RefreshControl, ScrollView } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  RefreshControl,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 
@@ -29,6 +35,7 @@ export default function DashboardScreen() {
 
   const {
     data: me,
+    isLoading,
     isRefetching,
     refetch,
   } = useQuery({
@@ -39,6 +46,14 @@ export default function DashboardScreen() {
       return (await res.json()) as MeResponse;
     },
   });
+
+  if (isLoading) {
+    return (
+      <View style={[styles.loader, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <ScrollView
@@ -129,6 +144,11 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flexGrow: 1,
   },

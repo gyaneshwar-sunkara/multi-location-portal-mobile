@@ -1,7 +1,7 @@
-import { apiPublicFetch } from '@/lib/api-client.js';
-import { parseApiError } from '@/lib/api-error.js';
-import { useAuthStore } from '@/stores/auth-store.js';
-import type { AuthResponse, MeResponse } from '@/lib/types.js';
+import { apiPublicFetch } from '@/lib/api-client';
+import { parseApiError } from '@/lib/api-error';
+import { useAuthStore } from '@/stores/auth-store';
+import type { AuthResponse, MeResponse } from '@/lib/types';
 
 /**
  * Complete the authentication flow after login/register/2FA verify.
