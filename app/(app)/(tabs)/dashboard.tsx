@@ -1,0 +1,141 @@
+import { View, StyleSheet, RefreshControl, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
+
+import { useAppTheme } from '@/providers/theme-provider';
+import { useAuthStore } from '@/stores/auth-store';
+import {
+  Text,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from '@/components/ui';
+import { apiFetch } from '@/lib/api-client';
+import { qk } from '@/lib/query-keys';
+import type { MeResponse } from '@/lib/types';
+
+export default function DashboardScreen() {
+  const { t } = useTranslation();
+  const { theme } = useAppTheme();
+  const user = useAuthStore((s) => s.user);
+  const activeOrganizationId = useAuthStore((s) => s.activeOrganizationId);
+  const memberships = useAuthStore((s) => s.memberships);
+
+  const activeOrg = memberships.find(
+    (m) => m.organizationId === activeOrganizationId,
+  );
+
+  const {
+    data: me,
+    isRefetching,
+    refetch,
+  } = useQuery({
+    queryKey: qk.authMe,
+    queryFn: async () => {
+      const res = await apiFetch('/auth/me');
+      if (!res.ok) throw new Error('Failed to fetch profile');
+      return (await res.json()) as MeResponse;
+    },
+  });
+
+  return (
+    <ScrollView
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
+      contentContainerStyle={[
+        styles.container,
+        { padding: theme.spacing.lg, gap: theme.spacing.lg },
+      ]}
+      refreshControl={
+        <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+      }
+    >
+      {/* Greeting */}
+      <View style={{ gap: theme.spacing.xs }}>
+        <Text variant="h2">
+          {t('dashboard.welcome', { name: user?.firstName ?? '' })}
+        </Text>
+        <Text variant="bodySmall" color={theme.colors.mutedForeground}>
+          {t('dashboard.description')}
+        </Text>
+      </View>
+
+      {/* Active Organization */}
+      {activeOrg && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{activeOrg.organizationName}</CardTitle>
+            <CardDescription>
+              {activeOrg.roleName} · {activeOrg.organizationSlug}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <View style={{ gap: theme.spacing.xs }}>
+              <View style={styles.statRow}>
+                <Text variant="bodySmall" color={theme.colors.mutedForeground}>
+                  {t('auth.organization')}
+                </Text>
+                <Text variant="body">{activeOrg.organizationName}</Text>
+              </View>
+              <View style={styles.statRow}>
+                <Text variant="bodySmall" color={theme.colors.mutedForeground}>
+                  {t('auth.assignedRole')}
+                </Text>
+                <Text variant="body">{activeOrg.roleName}</Text>
+              </View>
+            </View>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Account Info */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('settings.profile.title')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <View style={{ gap: theme.spacing.xs }}>
+            <View style={styles.statRow}>
+              <Text variant="bodySmall" color={theme.colors.mutedForeground}>
+                {t('auth.emailAddress')}
+              </Text>
+              <Text variant="body">{me?.email ?? user?.email}</Text>
+            </View>
+            {(me?.firstName ?? user?.firstName) && (
+              <View style={styles.statRow}>
+                <Text variant="bodySmall" color={theme.colors.mutedForeground}>
+                  {t('auth.firstName')}
+                </Text>
+                <Text variant="body">
+                  {me?.firstName ?? user?.firstName}{' '}
+                  {me?.lastName ?? user?.lastName}
+                </Text>
+              </View>
+            )}
+            <View style={styles.statRow}>
+              <Text variant="bodySmall" color={theme.colors.mutedForeground}>
+                {t('common.organizations')}
+              </Text>
+              <Text variant="body">
+                {(me?.memberships ?? memberships).length}
+              </Text>
+            </View>
+          </View>
+        </CardContent>
+      </Card>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+  },
+  statRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    minHeight: 32,
+  },
+});
