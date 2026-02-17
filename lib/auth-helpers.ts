@@ -8,22 +8,27 @@ import type { AuthResponse, MeResponse } from '@/lib/types';
  * Fetches /auth/me for memberships, then persists everything to auth store.
  */
 export async function completeAuth(authResponse: AuthResponse): Promise<void> {
-  const meResponse = await apiPublicFetch('/auth/me', {
-    headers: { Authorization: `Bearer ${authResponse.accessToken}` },
-  });
+  let memberships: MeResponse['memberships'] = [];
+  let activeOrgId: string | null = null;
 
-  if (!meResponse.ok) {
-    throw new Error('Failed to fetch user profile');
+  try {
+    const meResponse = await apiPublicFetch('/auth/me', {
+      headers: { Authorization: `Bearer ${authResponse.accessToken}` },
+    });
+
+    if (meResponse.ok) {
+      const me: MeResponse = await meResponse.json();
+      memberships = me.memberships ?? [];
+      const defaultOrgId = authResponse.user.defaultOrgId;
+      const isDefaultValid =
+        defaultOrgId && memberships.some((m) => m.organizationId === defaultOrgId);
+      activeOrgId = isDefaultValid
+        ? defaultOrgId
+        : (memberships[0]?.organizationId ?? null);
+    }
+  } catch {
+    // /auth/me failed — proceed with login, memberships can be fetched later
   }
-
-  const me: MeResponse = await meResponse.json();
-  const memberships = me.memberships ?? [];
-  const defaultOrgId = authResponse.user.defaultOrgId;
-  const isDefaultValid =
-    defaultOrgId && memberships.some((m) => m.organizationId === defaultOrgId);
-  const activeOrgId = isDefaultValid
-    ? defaultOrgId
-    : (memberships[0]?.organizationId ?? null);
 
   await useAuthStore.getState().setAuth(
     authResponse.accessToken,

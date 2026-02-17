@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -29,6 +30,8 @@ export default function DashboardScreen() {
   const activeOrganizationId = useAuthStore((s) => s.activeOrganizationId);
   const memberships = useAuthStore((s) => s.memberships);
 
+  const setActiveOrganization = useAuthStore((s) => s.setActiveOrganization);
+
   const activeOrg = memberships.find(
     (m) => m.organizationId === activeOrganizationId,
   );
@@ -46,6 +49,28 @@ export default function DashboardScreen() {
       return (await res.json()) as MeResponse;
     },
   });
+
+  // Sync fresh membership data back to auth store (covers the case where
+  // completeAuth couldn't fetch memberships during login)
+  useEffect(() => {
+    if (!me) return;
+    const store = useAuthStore.getState();
+    const freshMemberships = me.memberships ?? [];
+
+    if (store.user) {
+      store.setUser({ ...store.user, ...me });
+    }
+
+    // Only update if store has stale/empty memberships
+    if (freshMemberships.length > 0 && store.memberships.length !== freshMemberships.length) {
+      useAuthStore.setState({ memberships: freshMemberships });
+    }
+
+    // Set active org if none is set yet
+    if (!store.activeOrganizationId && freshMemberships.length > 0) {
+      setActiveOrganization(freshMemberships[0].organizationId);
+    }
+  }, [me, setActiveOrganization]);
 
   if (isLoading) {
     return (
