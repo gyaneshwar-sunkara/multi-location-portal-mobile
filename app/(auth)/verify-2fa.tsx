@@ -115,52 +115,75 @@ export default function Verify2faScreen() {
     if (!challengeToken) return;
     setServerError('');
     setIsSending(true);
-    const result = await send2faOtp(
-      selectedMethod as 'email' | 'sms',
-      challengeToken,
-    );
-    setIsSending(false);
-    if (result.error) {
-      setServerError(result.error);
-      return;
+    try {
+      const result = await send2faOtp(
+        selectedMethod as 'email' | 'sms',
+        challengeToken,
+      );
+      if (result.error) {
+        setServerError(result.error);
+        return;
+      }
+      setOtpSent(true);
+      resendTimer.restart(OTP_RESEND_COOLDOWN_S);
+    } catch {
+      setServerError(t('errorState.genericDescription'));
+    } finally {
+      setIsSending(false);
     }
-    setOtpSent(true);
-    resendTimer.restart(OTP_RESEND_COOLDOWN_S);
   }
 
   async function handleVerifyCode() {
     if (code.length !== 6 || !challengeToken) return;
     setServerError('');
     setIsVerifying(true);
-    const result = await verify2faCode(selectedMethod, {
-      challengeToken,
-      code,
-      trustDevice,
-    });
-    setIsVerifying(false);
-    if (result.error) {
-      setServerError(result.error);
-      return;
+    try {
+      const result = await verify2faCode(selectedMethod, {
+        challengeToken,
+        code,
+        trustDevice,
+      });
+      if (result.error) {
+        setServerError(result.error);
+        return;
+      }
+      if (!result.auth) {
+        setServerError(t('errorState.genericDescription'));
+        return;
+      }
+      await completeAuth(result.auth);
+      router.replace('/(app)');
+    } catch {
+      setServerError(t('errorState.genericDescription'));
+    } finally {
+      setIsVerifying(false);
     }
-    await completeAuth(result.auth!);
-    router.replace('/(app)');
   }
 
   async function handleVerifyRecovery() {
     if (!recoveryCode.trim() || !challengeToken) return;
     setServerError('');
     setIsVerifying(true);
-    const result = await verifyRecoveryCode({
-      challengeToken,
-      code: recoveryCode.trim(),
-    });
-    setIsVerifying(false);
-    if (result.error) {
-      setServerError(result.error);
-      return;
+    try {
+      const result = await verifyRecoveryCode({
+        challengeToken,
+        code: recoveryCode.trim(),
+      });
+      if (result.error) {
+        setServerError(result.error);
+        return;
+      }
+      if (!result.auth) {
+        setServerError(t('errorState.genericDescription'));
+        return;
+      }
+      await completeAuth(result.auth);
+      router.replace('/(app)');
+    } catch {
+      setServerError(t('errorState.genericDescription'));
+    } finally {
+      setIsVerifying(false);
     }
-    await completeAuth(result.auth!);
-    router.replace('/(app)');
   }
 
   if (!challengeToken) return null;
@@ -419,6 +442,7 @@ export default function Verify2faScreen() {
               textAlign="center"
               autoComplete="off"
               autoCapitalize="characters"
+              maxLength={20}
               style={styles.codeInput}
             />
             <Text variant="caption" color={theme.colors.mutedForeground}>

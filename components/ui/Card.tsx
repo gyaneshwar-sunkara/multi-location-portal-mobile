@@ -4,6 +4,7 @@ import { useAppTheme } from '@/providers/theme-provider';
 import { Text } from './Text';
 
 function isTextContent(children: React.ReactNode): boolean {
+  if (children == null || typeof children === 'boolean') return true;
   if (typeof children === 'string' || typeof children === 'number') return true;
   if (Array.isArray(children)) return children.every(isTextContent);
   return false;

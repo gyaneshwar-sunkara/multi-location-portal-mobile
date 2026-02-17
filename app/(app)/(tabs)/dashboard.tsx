@@ -82,7 +82,7 @@ export default function DashboardScreen() {
           <CardHeader>
             <CardTitle>{activeOrg.organizationName}</CardTitle>
             <CardDescription>
-              {activeOrg.roleName} · {activeOrg.organizationSlug}
+              {`${activeOrg.roleName} · ${activeOrg.organizationSlug}`}
             </CardDescription>
           </CardHeader>
           <CardContent>

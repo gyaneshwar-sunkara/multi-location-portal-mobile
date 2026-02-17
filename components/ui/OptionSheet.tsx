@@ -78,7 +78,7 @@ export function OptionSheet<T>({
                       borderRadius: theme.radii.md,
                     },
                     isSelected && {
-                      backgroundColor: theme.colors.primaryForeground ?? theme.colors.muted,
+                      backgroundColor: theme.colors.muted,
                     },
                     pressed && { opacity: 0.7 },
                     index < options.length - 1 && { marginBottom: 2 },
