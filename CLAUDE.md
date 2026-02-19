@@ -34,11 +34,13 @@ app/
 ├── +not-found.tsx           # 404 screen
 ├── (auth)/
 │   ├── _layout.tsx          # Auth stack navigator (public screens, no header)
-│   ├── sign-in.tsx          # Email + password login, 2FA branching
-│   ├── register.tsx         # Registration with password requirements checklist
+│   ├── sign-in.tsx          # Email + password + social login (Google/Apple), 2FA branching
+│   ├── register.tsx         # Registration with password requirements + social login
 │   ├── forgot-password.tsx  # Request password reset → success state
 │   ├── verify-2fa.tsx       # OTP verification (TOTP/email/SMS) + recovery codes
-│   └── reset-password.tsx   # Set new password (from deep link)
+│   ├── reset-password.tsx   # Set new password (from deep link)
+│   ├── verify-email.tsx     # Email verification (from deep link, auto-verifies on mount)
+│   └── accept-invitation.tsx # Accept org invitation (from deep link, validates + accepts)
 └── (app)/
     ├── _layout.tsx          # Auth guard (Redirect if unauthenticated) + Stack
     ├── index.tsx             # Redirect → (tabs)/dashboard
@@ -53,8 +55,8 @@ lib/
 ├── config.ts                # API_URL from EXPO_PUBLIC_API_URL with platform-aware dev fallback
 ├── api-client.ts            # apiFetch() (auth + refresh) + apiPublicFetch() (no auth)
 ├── api-error.ts             # extractApiError(), parseApiError() — localized error messages
-├── auth-helpers.ts          # completeAuth() (fetchMe + setAuth), 2FA API wrappers
-├── types.ts                 # User, Membership, AuthResponse, TwoFactorChallengeResponse, etc.
+├── auth-helpers.ts          # completeAuth() (fetchMe + setAuth), refreshMemberships(), 2FA API wrappers
+├── types.ts                 # User, Membership, AuthResponse, TwoFactorChallengeResponse, InvitationValidation, etc.
 ├── permissions.ts           # P constants, hasPermission(), meetsOrgHierarchy()
 ├── query-keys.ts            # Query key factory: qk.authMe, qk.organizationsList, etc.
 └── validations/
@@ -72,8 +74,9 @@ hooks/
 └── use-countdown.ts         # Countdown timer hook (2FA expiry, OTP resend cooldown)
 components/
 ├── auth/
-│   ├── AuthScreenLayout.tsx # Shared wrapper: SafeAreaView + KeyboardAvoidingView + ScrollView
-│   └── PasswordInput.tsx    # Password field with show/hide eye icon toggle
+│   ├── AuthScreenLayout.tsx  # Shared wrapper: SafeAreaView + KeyboardAvoidingView + ScrollView
+│   ├── PasswordInput.tsx     # Password field with show/hide eye icon toggle
+│   └── SocialLoginButtons.tsx # Google + Apple sign-in buttons with divider
 ├── ui/
 │   ├── Text.tsx             # Themed text with variant prop (h1/h2/h3/body/bodySmall/caption/label)
 │   ├── Button.tsx           # Themed button (default/secondary/destructive/outline/ghost, loading)
@@ -107,8 +110,10 @@ theme/
 - `auth-store.setAuth()` — full login flow: persist tokens to SecureStore, user/memberships to MMKV
 - `auth-store.logout()` — clears both stores, resets state
 - `auth-helpers.ts` — `completeAuth(authResponse)` fetches `/auth/me` for memberships, then calls `setAuth()`
+- `auth-helpers.ts` — `refreshMemberships()` re-fetches `/auth/me` and updates memberships in store (used after accepting invitations)
 - `providers/auth-provider.tsx` — `useAuth()` returns `{ isAuthenticated, isLoading, user, logout }`
 - Splash screen gates on `isHydrated` — no flash of wrong screen
+- **Social login:** Google via `@react-native-google-signin/google-signin`, Apple via `expo-apple-authentication` (iOS only). Both call `/auth/google` or `/auth/apple`, return same `LoginResponse` as email login (may trigger 2FA)
 
 ### API Client
 
@@ -158,7 +163,7 @@ theme/
 - **Keyboard handling:** `AuthScreenLayout` wraps forms in `KeyboardAvoidingView` (iOS padding) + `ScrollView` (keyboardShouldPersistTaps)
 - **Network detection:** `onlineManager` wired to `@react-native-community/netinfo`
 - **Focus detection:** `focusManager` wired to `AppState` (refetch on app foreground)
-- **Deep links:** scheme `portal-mobile://` (from app.json). Reset-password reads token from URL params via `useLocalSearchParams()`
+- **Deep links:** scheme `portal-mobile://` (from app.json). Supported deep links: `reset-password?token=`, `verify-email?token=`, `accept-invitation?token=` — all read params via `useLocalSearchParams()`
 - **MMKV required:** Won't work in Expo Go. Use `npx expo prebuild` or EAS Build.
 
 ## Mobile vs Web Adaptations

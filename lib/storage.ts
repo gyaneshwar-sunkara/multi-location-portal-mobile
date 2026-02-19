@@ -10,3 +10,22 @@ export const mmkvStorage: StateStorage = {
   setItem: (name, value) => mmkv.set(name, value),
   removeItem: (name) => mmkv.remove(name),
 };
+
+// ── Pending Invitation Token ────────────────────────────────────────────────
+// Stored when an unauthenticated user taps an invitation deep link.
+// After sign-in/register succeeds, the app checks for this and redirects
+// to the accept-invitation screen instead of the dashboard.
+
+const PENDING_INVITATION_KEY = 'pending-invitation-token';
+
+export function setPendingInvitationToken(token: string): void {
+  mmkv.set(PENDING_INVITATION_KEY, token);
+}
+
+export function getPendingInvitationToken(): string | null {
+  return mmkv.getString(PENDING_INVITATION_KEY) ?? null;
+}
+
+export function clearPendingInvitationToken(): void {
+  mmkv.remove(PENDING_INVITATION_KEY);
+}

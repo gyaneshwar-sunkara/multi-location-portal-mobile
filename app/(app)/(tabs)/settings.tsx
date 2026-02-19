@@ -57,8 +57,10 @@ export default function SettingsScreen() {
           key: 'email',
           icon: 'mail-outline',
           label: t('settings.email.title'),
-          value: user?.email ?? undefined,
-          onPress: () => {},
+          value: user?.isEmailVerified
+            ? t('settings.email.verified')
+            : t('settings.email.unverified'),
+          onPress: () => router.push('/(app)/settings/email'),
         },
         {
           key: 'change-password',

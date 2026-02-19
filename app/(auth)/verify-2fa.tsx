@@ -14,6 +14,7 @@ import {
   verify2faCode,
   verifyRecoveryCode,
 } from '@/lib/auth-helpers';
+import { getPendingInvitationToken, clearPendingInvitationToken } from '@/lib/storage';
 
 type TwoFactorMethod = 'totp' | 'email' | 'sms';
 type TabMode = 'code' | 'recovery';
@@ -73,6 +74,19 @@ export default function Verify2faScreen() {
   const resendTimer = useCountdown(0, { autoStart: false });
 
   const needsOtpSend = selectedMethod === 'email' || selectedMethod === 'sms';
+
+  function navigateAfterAuth() {
+    const pendingToken = getPendingInvitationToken();
+    if (pendingToken) {
+      clearPendingInvitationToken();
+      router.replace({
+        pathname: '/(auth)/accept-invitation',
+        params: { token: pendingToken },
+      });
+      return;
+    }
+    router.replace('/(app)');
+  }
 
   // Redirect if no challenge token
   useEffect(() => {
@@ -152,7 +166,7 @@ export default function Verify2faScreen() {
         return;
       }
       await completeAuth(result.auth);
-      router.replace('/(app)');
+      navigateAfterAuth();
     } catch {
       setServerError(t('errorState.genericDescription'));
     } finally {
@@ -178,7 +192,7 @@ export default function Verify2faScreen() {
         return;
       }
       await completeAuth(result.auth);
-      router.replace('/(app)');
+      navigateAfterAuth();
     } catch {
       setServerError(t('errorState.genericDescription'));
     } finally {

@@ -28,6 +28,7 @@ interface AuthState {
   ) => Promise<void>;
   setTokens: (accessToken: string, refreshToken: string) => Promise<void>;
   setUser: (user: User) => void;
+  setMemberships: (memberships: Membership[]) => void;
   setActiveOrganization: (orgId: string | null) => void;
   hydrate: () => Promise<void>;
   logout: () => Promise<void>;
@@ -65,6 +66,8 @@ export const useAuthStore = create<AuthState>()(
       },
 
       setUser: (user) => set({ user }),
+
+      setMemberships: (memberships) => set({ memberships }),
 
       setActiveOrganization: (orgId) => set({ activeOrganizationId: orgId }),
 

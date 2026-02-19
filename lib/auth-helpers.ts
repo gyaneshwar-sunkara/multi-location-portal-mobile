@@ -1,4 +1,4 @@
-import { apiPublicFetch } from '@/lib/api-client';
+import { apiFetch, apiPublicFetch } from '@/lib/api-client';
 import { parseApiError } from '@/lib/api-error';
 import { useAuthStore } from '@/stores/auth-store';
 import type { AuthResponse, MeResponse } from '@/lib/types';
@@ -37,6 +37,23 @@ export async function completeAuth(authResponse: AuthResponse): Promise<void> {
     memberships,
     activeOrgId,
   );
+}
+
+/**
+ * Re-fetch /auth/me and update memberships in the auth store.
+ * Used after accepting an invitation to reflect the new org membership.
+ */
+export async function refreshMemberships(): Promise<void> {
+  try {
+    const response = await apiFetch('/auth/me');
+    if (!response.ok) return;
+
+    const me: MeResponse = await response.json();
+    const store = useAuthStore.getState();
+    store.setMemberships(me.memberships ?? []);
+  } catch {
+    // Non-critical — memberships will refresh on next app foreground
+  }
 }
 
 // ── 2FA API Helpers ─────────────────────────────────────────────────────────

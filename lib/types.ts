@@ -116,6 +116,17 @@ export interface NotificationPreferences {
   push: { security: boolean; organization: boolean };
 }
 
+// ── Invitation Types ──────────────────────────────────────────────────────
+
+export interface InvitationValidation {
+  valid: boolean;
+  email?: string;
+  organizationName?: string;
+  roleName?: string;
+  expiresAt?: string;
+  error?: string;
+}
+
 // ── Generic Utility Types ───────────────────────────────────────────────────
 
 export interface ActionResult {

@@ -29,6 +29,10 @@ export default function AppLayout() {
         options={{ title: t('settings.profile.title'), headerBackTitle: t('common.settings') }}
       />
       <Stack.Screen
+        name="settings/email"
+        options={{ title: t('settings.email.title'), headerBackTitle: t('common.settings') }}
+      />
+      <Stack.Screen
         name="settings/change-password"
         options={{ title: t('settings.password.title'), headerBackTitle: t('common.settings') }}
       />

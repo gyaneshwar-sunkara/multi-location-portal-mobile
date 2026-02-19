@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
-import { View, Pressable, StyleSheet } from 'react-native';
+import { View, Pressable, Platform, StyleSheet } from 'react-native';
 import { useRouter, Link } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import * as AppleAuthentication from 'expo-apple-authentication';
 
 import { useAppTheme } from '@/providers/theme-provider';
 import { AuthScreenLayout } from '@/components/auth/AuthScreenLayout';
 import { BrandHeader } from '@/components/auth/BrandHeader';
 import { PasswordInput } from '@/components/auth/PasswordInput';
+import { SocialLoginButtons } from '@/components/auth/SocialLoginButtons';
 import { Text, Button, Input, Label } from '@/components/ui';
 import { loginSchema, type LoginInput } from '@/lib/validations/auth';
 import { apiPublicFetch } from '@/lib/api-client';
 import { parseApiError } from '@/lib/api-error';
 import { completeAuth } from '@/lib/auth-helpers';
+import { getPendingInvitationToken, clearPendingInvitationToken } from '@/lib/storage';
 import { isTwoFactorChallenge, type LoginResponse } from '@/lib/types';
 
 export default function SignInScreen() {
@@ -32,6 +36,100 @@ export default function SignInScreen() {
     defaultValues: { email: '', password: '' },
   });
 
+  async function handleSocialLoginResponse(response: Response) {
+    if (!response.ok) {
+      const error = await parseApiError(response, t('errorState.genericDescription'));
+      setServerError(error);
+      return;
+    }
+
+    const result: LoginResponse = await response.json();
+
+    if (isTwoFactorChallenge(result)) {
+      router.push({
+        pathname: '/(auth)/verify-2fa',
+        params: {
+          challengeToken: result.challengeToken,
+          methods: result.methods.join(','),
+          expiresAt: result.expiresAt,
+        },
+      });
+      return;
+    }
+
+    await completeAuth(result);
+
+    // If there's a pending invitation, redirect to accept it instead of dashboard
+    const pendingToken = getPendingInvitationToken();
+    if (pendingToken) {
+      clearPendingInvitationToken();
+      router.replace({
+        pathname: '/(auth)/accept-invitation',
+        params: { token: pendingToken },
+      });
+      return;
+    }
+
+    router.replace('/(app)');
+  }
+
+  async function handleGoogleSignIn() {
+    setServerError('');
+    setIsLoading(true);
+    try {
+      await GoogleSignin.hasPlayServices();
+      const result = await GoogleSignin.signIn();
+      const idToken = result.data?.idToken;
+      if (!idToken) return;
+
+      const response = await apiPublicFetch('/auth/google', {
+        method: 'POST',
+        body: JSON.stringify({ idToken }),
+      });
+      await handleSocialLoginResponse(response);
+    } catch (error: unknown) {
+      // User cancelled — not an error
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'SIGN_IN_CANCELLED') return;
+      setServerError(t('errorState.genericDescription'));
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleAppleSignIn() {
+    if (Platform.OS !== 'ios') return;
+    setServerError('');
+    setIsLoading(true);
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      if (!credential.identityToken) return;
+
+      const response = await apiPublicFetch('/auth/apple', {
+        method: 'POST',
+        body: JSON.stringify({
+          identityToken: credential.identityToken,
+          user: {
+            firstName: credential.fullName?.givenName ?? undefined,
+            lastName: credential.fullName?.familyName ?? undefined,
+          },
+        }),
+      });
+      await handleSocialLoginResponse(response);
+    } catch (error: unknown) {
+      // User cancelled — not an error
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'ERR_REQUEST_CANCELED') return;
+      setServerError(t('errorState.genericDescription'));
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   async function onSubmit(data: LoginInput) {
     setServerError('');
     setIsLoading(true);
@@ -40,29 +138,7 @@ export default function SignInScreen() {
         method: 'POST',
         body: JSON.stringify(data),
       });
-
-      if (!response.ok) {
-        const error = await parseApiError(response, t('auth.invalidCredentials'));
-        setServerError(error);
-        return;
-      }
-
-      const result: LoginResponse = await response.json();
-
-      if (isTwoFactorChallenge(result)) {
-        router.push({
-          pathname: '/(auth)/verify-2fa',
-          params: {
-            challengeToken: result.challengeToken,
-            methods: result.methods.join(','),
-            expiresAt: result.expiresAt,
-          },
-        });
-        return;
-      }
-
-      await completeAuth(result);
-      router.replace('/(app)');
+      await handleSocialLoginResponse(response);
     } catch {
       setServerError(t('errorState.genericDescription'));
     } finally {
@@ -170,6 +246,15 @@ export default function SignInScreen() {
         >
           {t('auth.signIn')}
         </Button>
+      </View>
+
+      {/* Social Login */}
+      <View style={{ marginTop: theme.spacing.lg }}>
+        <SocialLoginButtons
+          disabled={isLoading}
+          onGooglePress={handleGoogleSignIn}
+          onApplePress={handleAppleSignIn}
+        />
       </View>
 
       {/* Footer */}

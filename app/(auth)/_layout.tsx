@@ -48,6 +48,26 @@ export default function AuthLayout() {
           headerTintColor: theme.colors.foreground,
         }}
       />
+      <Stack.Screen
+        name="verify-email"
+        options={{
+          headerShown: true,
+          title: '',
+          headerShadowVisible: false,
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerTintColor: theme.colors.foreground,
+        }}
+      />
+      <Stack.Screen
+        name="accept-invitation"
+        options={{
+          headerShown: true,
+          title: '',
+          headerShadowVisible: false,
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerTintColor: theme.colors.foreground,
+        }}
+      />
     </Stack>
   );
 }
