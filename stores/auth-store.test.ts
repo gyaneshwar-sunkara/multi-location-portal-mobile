@@ -121,6 +121,62 @@ describe('auth-store', () => {
     });
   });
 
+  describe('hydrate', () => {
+    it('sets isAuthenticated true when tokens and user exist', async () => {
+      // Pre-populate SecureStore with tokens
+      await SecureStore.setItemAsync('auth-access-token', 'at');
+      await SecureStore.setItemAsync('auth-refresh-token', 'rt');
+
+      // Simulate persist middleware having rehydrated user from MMKV
+      useAuthStore.setState({ user: mockUser, memberships: [mockMembership] });
+
+      await useAuthStore.getState().hydrate();
+
+      const state = useAuthStore.getState();
+      expect(state.isAuthenticated).toBe(true);
+      expect(state.isHydrated).toBe(true);
+      expect(state.accessToken).toBe('at');
+      expect(state.refreshToken).toBe('rt');
+    });
+
+    it('clears stale data when tokens are missing from SecureStore', async () => {
+      // Persist middleware rehydrated user but tokens were deleted (e.g. after device wipe)
+      useAuthStore.setState({ user: mockUser, memberships: [mockMembership] });
+
+      await useAuthStore.getState().hydrate();
+
+      const state = useAuthStore.getState();
+      expect(state.isAuthenticated).toBe(false);
+      expect(state.isHydrated).toBe(true);
+      expect(state.user).toBeNull();
+      expect(state.memberships).toEqual([]);
+      expect(state.accessToken).toBeNull();
+    });
+
+    it('sets not authenticated when user is missing', async () => {
+      // Tokens exist in SecureStore but no user data from MMKV
+      await SecureStore.setItemAsync('auth-access-token', 'at');
+      await SecureStore.setItemAsync('auth-refresh-token', 'rt');
+
+      await useAuthStore.getState().hydrate();
+
+      const state = useAuthStore.getState();
+      expect(state.isAuthenticated).toBe(false);
+      expect(state.isHydrated).toBe(true);
+    });
+
+    it('sets not authenticated when only access token exists', async () => {
+      await SecureStore.setItemAsync('auth-access-token', 'at');
+      useAuthStore.setState({ user: mockUser });
+
+      await useAuthStore.getState().hydrate();
+
+      const state = useAuthStore.getState();
+      expect(state.isAuthenticated).toBe(false);
+      expect(state.isHydrated).toBe(true);
+    });
+  });
+
   describe('logout', () => {
     it('clears all state and SecureStore', async () => {
       // First authenticate

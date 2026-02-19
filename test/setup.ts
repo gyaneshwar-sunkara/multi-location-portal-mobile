@@ -21,7 +21,7 @@ beforeAll(() => {
   console.error = (...args: unknown[]) => {
     const message = typeof args[0] === 'string' ? args[0] : '';
     if (
-      message.includes('Warning: An update to') ||
+      message.includes('An update to') ||
       message.includes('act()')
     ) {
       return;

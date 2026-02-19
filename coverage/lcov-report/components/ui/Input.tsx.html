@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">87.5% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>7/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -126,27 +126,27 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -179,28 +179,28 @@ interface InputProps extends TextInputProps {
   error?: boolean;
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >Input(</span>{ error, style, onFocus, onBlur, ...props }: InputProps) {
-  const { theme } = <span class="cstat-no" title="statement not covered" >useAppTheme();</span>
-  const [focused, setFocused] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
-  const { colors, radii } = <span class="cstat-no" title="statement not covered" >theme;</span>
+export function Input({ error, style, onFocus, onBlur, ...props }: InputProps) {
+  const { theme } = useAppTheme();
+  const [focused, setFocused] = useState(false);
+  const { colors, radii } = theme;
 &nbsp;
-  const borderColor = <span class="cstat-no" title="statement not covered" >error</span>
+  const borderColor = error
     ? colors.destructive
     : focused
       ? colors.ring
       : colors.input;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return (</span>
+  return (
     &lt;TextInput
       placeholderTextColor={colors.mutedForeground}
       selectionColor={colors.primary}
-      onFocus={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; {
-<span class="cstat-no" title="statement not covered" >        setFocused(true);</span>
-<span class="cstat-no" title="statement not covered" >        onFocus?.(e);</span>
+      onFocus={(e) =&gt; {
+        setFocused(true);
+        onFocus?.(e);
       }}
-      onBlur={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; {
-<span class="cstat-no" title="statement not covered" >        setFocused(false);</span>
-<span class="cstat-no" title="statement not covered" >        onBlur?.(e);</span>
+      onBlur={(e) =&gt; {
+        setFocused(false);
+        onBlur?.(e);
       }}
       style={[
         {
@@ -218,7 +218,7 @@ export function <span class="fstat-no" title="function not covered" >Input(</spa
           paddingHorizontal: 13,
           backgroundColor: 'transparent',
         },
-        Platform.OS === 'android' &amp;&amp; { paddingVertical: 8 },
+        Platform.OS === 'android' &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >{ paddingVertical: 8 },</span>
         style,
       ]}
       {...props}
@@ -232,7 +232,7 @@ export function <span class="fstat-no" title="function not covered" >Input(</spa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-02-19T04:59:21.122Z
+                at 2026-02-19T05:05:46.887Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
