@@ -37,6 +37,76 @@ beforeEach(() => {
   useUIStore.setState({ language: 'en' });
 });
 
+describe('apiPublicFetch headers normalization', () => {
+  it('handles Headers instance', async () => {
+    mockFetch.mockResolvedValueOnce(new Response('{}', { status: 200 }));
+
+    const headers = new Headers();
+    headers.set('X-Custom', 'value');
+
+    await apiPublicFetch('/test', { headers });
+
+    // Headers class lowercases keys per HTTP spec
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'x-custom': 'value',
+        }),
+      }),
+    );
+  });
+
+  it('handles headers as array of tuples', async () => {
+    mockFetch.mockResolvedValueOnce(new Response('{}', { status: 200 }));
+
+    await apiPublicFetch('/test', {
+      headers: [['X-Custom', 'arr-value']],
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'X-Custom': 'arr-value',
+        }),
+      }),
+    );
+  });
+});
+
+describe('isTokenExpired (via apiFetch behavior)', () => {
+  it('treats malformed JWT as expired and triggers refresh', async () => {
+    useAuthStore.setState({
+      accessToken: 'not-a-jwt',
+      refreshToken: 'refresh-tok',
+      isAuthenticated: true,
+    });
+
+    // Refresh fails → throws
+    mockFetch.mockResolvedValueOnce(new Response('', { status: 401 }));
+
+    await expect(apiFetch('/users')).rejects.toThrow('Token refresh failed');
+  });
+
+  it('treats JWT with past exp as expired', async () => {
+    // Token that already expired 10 minutes ago
+    const pastExp = Math.floor(Date.now() / 1000) - 600;
+    const token = makeJwt(pastExp);
+
+    useAuthStore.setState({
+      accessToken: token,
+      refreshToken: 'refresh-tok',
+      isAuthenticated: true,
+    });
+
+    // Refresh fails
+    mockFetch.mockResolvedValueOnce(new Response('', { status: 500 }));
+
+    await expect(apiFetch('/users')).rejects.toThrow('Token refresh failed');
+  });
+});
+
 describe('apiPublicFetch', () => {
   it('makes request with Content-Type and Accept-Language', async () => {
     mockFetch.mockResolvedValueOnce(new Response('{}', { status: 200 }));
@@ -218,6 +288,20 @@ describe('apiFetch', () => {
     mockFetch.mockResolvedValueOnce(new Response('', { status: 401 }));
 
     await expect(apiFetch('/users')).rejects.toThrow('Authentication failed');
+  });
+
+  it('throws when refresh has no refresh token in store', async () => {
+    const soonExp = Math.floor(Date.now() / 1000) + 30;
+    const token = makeJwt(soonExp);
+
+    useAuthStore.setState({
+      accessToken: token,
+      refreshToken: null, // no refresh token
+      isAuthenticated: true,
+    });
+
+    await expect(apiFetch('/users')).rejects.toThrow('Token refresh failed');
+    expect(mockFetch).not.toHaveBeenCalled(); // never called fetch because refreshToken was null
   });
 
   it('throws when proactive refresh fails', async () => {
