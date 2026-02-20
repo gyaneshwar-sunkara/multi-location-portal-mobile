@@ -1,17 +1,19 @@
 import { Stack, useRouter } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAppTheme } from '@/providers/theme-provider';
 import { Text, Button } from '@/components/ui';
 
 export default function NotFoundScreen() {
+  const { t } = useTranslation();
   const { theme } = useAppTheme();
   const router = useRouter();
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
+      <Stack.Screen options={{ title: t('errorState.genericTitle') }} />
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <View
           style={[
@@ -26,7 +28,7 @@ export default function NotFoundScreen() {
           />
         </View>
         <Text variant="h3" style={styles.textCenter}>
-          This screen doesn't exist.
+          {t('errorState.pageNotFound')}
         </Text>
         <Button
           variant="outline"
@@ -34,7 +36,7 @@ export default function NotFoundScreen() {
           onPress={() => router.replace('/')}
           style={{ alignSelf: 'stretch' }}
         >
-          Go to home screen
+          {t('errorState.goHome')}
         </Button>
       </View>
     </>

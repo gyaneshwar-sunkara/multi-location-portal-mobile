@@ -40,11 +40,10 @@ export const useUIStore = create<UIState>()(
         const directionChanged = isRtl(oldLanguage) !== isRtl(language);
         if (directionChanged) {
           I18nManager.forceRTL(isRtl(language));
+          // i18next.changeLanguage() above has already switched, so t() returns the new language
           Alert.alert(
-            isRtl(language) ? 'تم تغيير اللغة' : 'Language Changed',
-            isRtl(language)
-              ? 'يرجى إعادة تشغيل التطبيق لتطبيق التغييرات.'
-              : 'Please restart the app to apply layout changes.',
+            i18next.t('language.changedTitle'),
+            i18next.t('language.changedDescription'),
           );
         }
       },

@@ -8,6 +8,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAppTheme } from '@/providers/theme-provider';
+import { useAuthStore } from '@/stores/auth-store';
 import { Text, Button, Input, Label, OptionSheet } from '@/components/ui';
 import {
   inviteMemberSchema,
@@ -23,13 +24,14 @@ export default function InviteMemberScreen() {
   const { theme } = useAppTheme();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const activeOrganizationId = useAuthStore((s) => s.activeOrganizationId);
   const [serverError, setServerError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [roleSheetVisible, setRoleSheetVisible] = useState(false);
 
   // ── Fetch roles ────────────────────────────────────────────────────────
   const { data: rolesData } = useQuery({
-    queryKey: qk.orgRoles,
+    queryKey: qk.orgRoles(activeOrganizationId!),
     queryFn: async () => {
       const res = await apiFetch('/roles');
       if (!res.ok) return { data: [] };
@@ -73,8 +75,8 @@ export default function InviteMemberScreen() {
       }
 
       Alert.alert('', t('org.inviteSent'));
-      queryClient.invalidateQueries({ queryKey: qk.orgMembers });
-      queryClient.invalidateQueries({ queryKey: qk.orgInvitations });
+      queryClient.invalidateQueries({ queryKey: qk.orgMembers(activeOrganizationId!) });
+      queryClient.invalidateQueries({ queryKey: qk.orgInvitations(activeOrganizationId!) });
       router.back();
     } catch {
       setServerError(t('errorState.genericDescription'));

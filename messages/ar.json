@@ -320,7 +320,9 @@
     "label": "اللغة",
     "en": "English",
     "es": "Español",
-    "ar": "العربية"
+    "ar": "العربية",
+    "changedTitle": "تم تغيير اللغة",
+    "changedDescription": "يرجى إعادة تشغيل التطبيق لتطبيق التغييرات."
   },
   "theme": {
     "label": "المظهر",

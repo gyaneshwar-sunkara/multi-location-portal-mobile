@@ -47,11 +47,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   input: {
-    paddingRight: 44,
+    paddingEnd: 44,
   },
   toggle: {
     position: 'absolute',
-    right: 0,
+    end: 0,
     height: 44,
     width: 44,
     alignItems: 'center',

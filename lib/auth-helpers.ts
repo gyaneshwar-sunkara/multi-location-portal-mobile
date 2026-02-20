@@ -50,7 +50,13 @@ export async function refreshMemberships(): Promise<void> {
 
     const me: MeResponse = await response.json();
     const store = useAuthStore.getState();
-    store.setMemberships(me.memberships ?? []);
+    const memberships = me.memberships ?? [];
+    store.setMemberships(memberships);
+
+    // If no active org is set but memberships exist, default to the first one
+    if (!store.activeOrganizationId && memberships.length > 0) {
+      store.setActiveOrganization(memberships[0].organizationId);
+    }
   } catch {
     // Non-critical — memberships will refresh on next app foreground
   }

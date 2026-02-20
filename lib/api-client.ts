@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { useUIStore } from '@/stores/ui-store';
 
 const TOKEN_EXPIRY_BUFFER_MS = 60_000; // Refresh 60s before actual expiry
+const REQUEST_TIMEOUT_MS = 30_000; // 30s request timeout
 
 // ── Token Expiry Check ──────────────────────────────────────────────────────
 
@@ -128,8 +129,12 @@ function makeAuthenticatedRequest(
     headers['x-organization-id'] = activeOrganizationId;
   }
 
+  // Use caller's signal if provided, otherwise apply default timeout
+  const signal = options.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+
   return fetch(`${API_URL}${path}`, {
     ...options,
+    signal,
     headers: {
       ...headers,
       ...toHeadersRecord(options.headers),
@@ -149,8 +154,12 @@ export async function apiPublicFetch(
 ): Promise<Response> {
   const { language } = useUIStore.getState();
 
+  // Use caller's signal if provided, otherwise apply default timeout
+  const signal = options.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+
   return fetch(`${API_URL}${path}`, {
     ...options,
+    signal,
     headers: {
       'Content-Type': 'application/json',
       'Accept-Language': language,

@@ -320,7 +320,9 @@
     "label": "Idioma",
     "en": "English",
     "es": "Español",
-    "ar": "العربية"
+    "ar": "العربية",
+    "changedTitle": "Idioma cambiado",
+    "changedDescription": "Por favor, reinicia la aplicación para aplicar los cambios de diseño."
   },
   "theme": {
     "label": "Tema",

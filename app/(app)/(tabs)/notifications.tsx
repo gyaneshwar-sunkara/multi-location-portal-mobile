@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   },
   unreadBar: {
     position: 'absolute',
-    left: 0,
+    start: 0,
     top: 8,
     bottom: 8,
     width: 3,

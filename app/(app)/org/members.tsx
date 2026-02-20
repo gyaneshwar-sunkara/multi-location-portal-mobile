@@ -73,7 +73,7 @@ export default function MembersScreen() {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: qk.orgMembersList({ orgId: activeOrganizationId }),
+    queryKey: qk.orgMembersList(activeOrganizationId!),
     queryFn: async ({ pageParam = 0 }) => {
       const res = await apiFetch(
         `/organizations/${activeOrganizationId}/members?skip=${pageParam}&take=${PAGE_SIZE}`,
@@ -98,7 +98,7 @@ export default function MembersScreen() {
 
   // ── Invitations query (admin only) ─────────────────────────────────────
   const { data: invitationsData } = useQuery({
-    queryKey: qk.orgInvitations,
+    queryKey: qk.orgInvitations(activeOrganizationId!),
     queryFn: async () => {
       const res = await apiFetch('/invitations?status=pending');
       if (!res.ok) return { data: [] };
@@ -141,7 +141,7 @@ export default function MembersScreen() {
               return;
             }
             Alert.alert('', t('org.removed'));
-            queryClient.invalidateQueries({ queryKey: qk.orgMembers });
+            queryClient.invalidateQueries({ queryKey: qk.orgMembers(activeOrganizationId!) });
           } catch {
             Alert.alert('', t('errorState.genericDescription'));
           } finally {
@@ -172,7 +172,7 @@ export default function MembersScreen() {
               return;
             }
             Alert.alert('', t('org.inviteCancelled'));
-            queryClient.invalidateQueries({ queryKey: qk.orgInvitations });
+            queryClient.invalidateQueries({ queryKey: qk.orgInvitations(activeOrganizationId!) });
           } catch {
             Alert.alert('', t('errorState.genericDescription'));
           }

@@ -31,11 +31,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [isHydrated, isAuthenticated, queryClient]);
 
-  // Clear stale query cache when active organization changes
+  // Invalidate org-scoped queries when active organization changes
   const prevOrgIdRef = useRef(activeOrganizationId);
   useEffect(() => {
     if (prevOrgIdRef.current !== null && prevOrgIdRef.current !== activeOrganizationId) {
-      queryClient.removeQueries();
+      // Invalidate all queries except user-scoped ones (auth, sessions, notifications, etc.)
+      const userScopedPrefixes = ['auth', 'sessions', 'notifications', 'two-factor', 'login-history', 'data-exports', 'login-alerts'];
+      queryClient.invalidateQueries({
+        predicate: (query) => {
+          const key = query.queryKey[0] as string;
+          return !userScopedPrefixes.includes(key);
+        },
+      });
     }
     prevOrgIdRef.current = activeOrganizationId;
   }, [activeOrganizationId, queryClient]);

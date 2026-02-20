@@ -1,10 +1,18 @@
-import { Stack } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useAppTheme } from '@/providers/theme-provider';
+import { useAuthStore } from '@/stores/auth-store';
 
 export default function AuthLayout() {
   const { theme } = useAppTheme();
   const { t } = useTranslation();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isHydrated = useAuthStore((s) => s.isHydrated);
+
+  // Redirect authenticated users to the app
+  if (isHydrated && isAuthenticated) {
+    return <Redirect href="/(app)" />;
+  }
 
   return (
     <Stack

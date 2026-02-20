@@ -320,7 +320,9 @@
     "label": "Language",
     "en": "English",
     "es": "Español",
-    "ar": "العربية"
+    "ar": "العربية",
+    "changedTitle": "Language Changed",
+    "changedDescription": "Please restart the app to apply layout changes."
   },
   "theme": {
     "label": "Theme",

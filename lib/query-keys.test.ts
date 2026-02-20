@@ -11,10 +11,8 @@ describe('query-keys', () => {
       expect(qk.organizations).toEqual(['organizations']);
     });
 
-    it('billing keys are stable', () => {
-      expect(qk.subscription).toEqual(['billing', 'subscription']);
+    it('billing plans key is stable', () => {
       expect(qk.plans).toEqual(['billing', 'plans']);
-      expect(qk.invoices).toEqual(['billing', 'invoices']);
     });
 
     it('notifications keys are stable', () => {
@@ -26,38 +24,6 @@ describe('query-keys', () => {
     it('two-factor keys are stable', () => {
       expect(qk.twoFactorStatus).toEqual(['two-factor', 'status']);
       expect(qk.trustedDevices).toEqual(['two-factor', 'trusted-devices']);
-    });
-
-    it('orgMembers key is stable', () => {
-      expect(qk.orgMembers).toEqual(['org-members']);
-    });
-
-    it('orgRoles key is stable', () => {
-      expect(qk.orgRoles).toEqual(['org-roles']);
-    });
-
-    it('orgInvitations key is stable', () => {
-      expect(qk.orgInvitations).toEqual(['org-invitations']);
-    });
-
-    it('roles key is stable', () => {
-      expect(qk.roles).toEqual(['roles']);
-    });
-
-    it('permissions key is stable', () => {
-      expect(qk.permissions).toEqual(['permissions']);
-    });
-
-    it('apiKeys key is stable', () => {
-      expect(qk.apiKeys).toEqual(['api-keys']);
-    });
-
-    it('serviceAccounts key is stable', () => {
-      expect(qk.serviceAccounts).toEqual(['service-accounts']);
-    });
-
-    it('webhooks key is stable', () => {
-      expect(qk.webhooks).toEqual(['webhooks']);
     });
 
     it('webhookEvents key is stable', () => {
@@ -100,12 +66,61 @@ describe('query-keys', () => {
       expect(qk.adminStats).toEqual(['admin-stats']);
     });
 
-    it('ssoConfig key is stable', () => {
-      expect(qk.ssoConfig).toEqual(['sso-config']);
-    });
-
     it('sessions key is stable', () => {
       expect(qk.sessions).toEqual(['sessions']);
+    });
+  });
+
+  describe('org-scoped keys include orgId', () => {
+    const orgId = 'org-1';
+
+    it('orgMembers includes orgId', () => {
+      expect(qk.orgMembers(orgId)).toEqual(['org-members', 'org-1']);
+    });
+
+    it('orgRoles includes orgId', () => {
+      expect(qk.orgRoles(orgId)).toEqual(['org-roles', 'org-1']);
+    });
+
+    it('orgInvitations includes orgId', () => {
+      expect(qk.orgInvitations(orgId)).toEqual(['org-invitations', 'org-1']);
+    });
+
+    it('roles includes orgId', () => {
+      expect(qk.roles(orgId)).toEqual(['roles', 'org-1']);
+    });
+
+    it('permissions includes orgId', () => {
+      expect(qk.permissions(orgId)).toEqual(['permissions', 'org-1']);
+    });
+
+    it('apiKeys includes orgId', () => {
+      expect(qk.apiKeys(orgId)).toEqual(['api-keys', 'org-1']);
+    });
+
+    it('serviceAccounts includes orgId', () => {
+      expect(qk.serviceAccounts(orgId)).toEqual(['service-accounts', 'org-1']);
+    });
+
+    it('webhooks includes orgId', () => {
+      expect(qk.webhooks(orgId)).toEqual(['webhooks', 'org-1']);
+    });
+
+    it('subscription includes orgId', () => {
+      expect(qk.subscription(orgId)).toEqual(['billing', 'subscription', 'org-1']);
+    });
+
+    it('invoices includes orgId', () => {
+      expect(qk.invoices(orgId)).toEqual(['billing', 'invoices', 'org-1']);
+    });
+
+    it('ssoConfig includes orgId', () => {
+      expect(qk.ssoConfig(orgId)).toEqual(['sso-config', 'org-1']);
+    });
+
+    it('different orgIds produce different keys', () => {
+      expect(qk.orgMembers('org-1')).not.toEqual(qk.orgMembers('org-2'));
+      expect(qk.roles('org-1')).not.toEqual(qk.roles('org-2'));
     });
   });
 
@@ -132,24 +147,24 @@ describe('query-keys', () => {
       ]);
     });
 
-    it('orgMembersList includes params', () => {
-      expect(qk.orgMembersList({ search: 'john' })).toEqual(['org-members', { search: 'john' }]);
+    it('orgMembersList includes orgId and params', () => {
+      expect(qk.orgMembersList('org-1', { search: 'john' })).toEqual(['org-members', 'org-1', { search: 'john' }]);
     });
 
-    it('rolesList includes params', () => {
-      expect(qk.rolesList({ page: 1 })).toEqual(['roles', { page: 1 }]);
+    it('rolesList includes orgId and params', () => {
+      expect(qk.rolesList('org-1', { page: 1 })).toEqual(['roles', 'org-1', { page: 1 }]);
     });
 
     it('roleDetail includes id', () => {
       expect(qk.roleDetail('role-1')).toEqual(['roles', 'role-1']);
     });
 
-    it('apiKeysList includes params', () => {
-      expect(qk.apiKeysList({ active: true })).toEqual(['api-keys', { active: true }]);
+    it('apiKeysList includes orgId and params', () => {
+      expect(qk.apiKeysList('org-1', { active: true })).toEqual(['api-keys', 'org-1', { active: true }]);
     });
 
-    it('serviceAccountsList includes params', () => {
-      expect(qk.serviceAccountsList()).toEqual(['service-accounts', undefined]);
+    it('serviceAccountsList includes orgId', () => {
+      expect(qk.serviceAccountsList('org-1')).toEqual(['service-accounts', 'org-1', undefined]);
     });
 
     it('serviceAccountDetail includes id', () => {
@@ -160,8 +175,8 @@ describe('query-keys', () => {
       expect(qk.serviceAccountKeys('sa-1')).toEqual(['service-accounts', 'sa-1', 'keys']);
     });
 
-    it('webhooksList includes params', () => {
-      expect(qk.webhooksList({ status: 'active' })).toEqual(['webhooks', { status: 'active' }]);
+    it('webhooksList includes orgId and params', () => {
+      expect(qk.webhooksList('org-1', { status: 'active' })).toEqual(['webhooks', 'org-1', { status: 'active' }]);
     });
 
     it('webhookDetail includes id', () => {

@@ -14,51 +14,51 @@ export const qk = {
     ["organizations", params] as const,
   organizationDetail: (id: string) => ["organizations", id] as const,
 
-  // Members (with orgId for cache separation, without for implicit org context)
+  // Members (with orgId for cache separation on org switch)
   members: (orgId: string) => ["organizations", orgId, "members"] as const,
   membersList: (orgId: string, params?: Record<string, unknown>) =>
     ["organizations", orgId, "members", params] as const,
-  orgMembers: ["org-members"] as const,
-  orgMembersList: (params?: Record<string, unknown>) =>
-    ["org-members", params] as const,
-  orgRoles: ["org-roles"] as const,
-  orgInvitations: ["org-invitations"] as const,
+  orgMembers: (orgId: string) => ["org-members", orgId] as const,
+  orgMembersList: (orgId: string, params?: Record<string, unknown>) =>
+    ["org-members", orgId, params] as const,
+  orgRoles: (orgId: string) => ["org-roles", orgId] as const,
+  orgInvitations: (orgId: string) => ["org-invitations", orgId] as const,
 
-  // Roles
-  roles: ["roles"] as const,
-  rolesList: (params?: Record<string, unknown>) =>
-    ["roles", params] as const,
+  // Roles (org-scoped)
+  roles: (orgId: string) => ["roles", orgId] as const,
+  rolesList: (orgId: string, params?: Record<string, unknown>) =>
+    ["roles", orgId, params] as const,
   roleDetail: (id: string) => ["roles", id] as const,
 
-  // Permissions
-  permissions: ["permissions"] as const,
+  // Permissions (org-scoped)
+  permissions: (orgId: string) => ["permissions", orgId] as const,
 
-  // API Keys
-  apiKeys: ["api-keys"] as const,
-  apiKeysList: (params?: Record<string, unknown>) =>
-    ["api-keys", params] as const,
+  // API Keys (org-scoped)
+  apiKeys: (orgId: string) => ["api-keys", orgId] as const,
+  apiKeysList: (orgId: string, params?: Record<string, unknown>) =>
+    ["api-keys", orgId, params] as const,
 
-  // Service Accounts
-  serviceAccounts: ["service-accounts"] as const,
-  serviceAccountsList: (params?: Record<string, unknown>) =>
-    ["service-accounts", params] as const,
+  // Service Accounts (org-scoped)
+  serviceAccounts: (orgId: string) => ["service-accounts", orgId] as const,
+  serviceAccountsList: (orgId: string, params?: Record<string, unknown>) =>
+    ["service-accounts", orgId, params] as const,
   serviceAccountDetail: (id: string) => ["service-accounts", id] as const,
   serviceAccountKeys: (id: string) => ["service-accounts", id, "keys"] as const,
 
-  // Webhooks
-  webhooks: ["webhooks"] as const,
-  webhooksList: (params?: Record<string, unknown>) =>
-    ["webhooks", params] as const,
+  // Webhooks (org-scoped)
+  webhooks: (orgId: string) => ["webhooks", orgId] as const,
+  webhooksList: (orgId: string, params?: Record<string, unknown>) =>
+    ["webhooks", orgId, params] as const,
   webhookDetail: (id: string) => ["webhooks", id] as const,
   webhookDeliveries: (id: string) => ["webhooks", id, "deliveries"] as const,
   webhookDeliveriesList: (id: string, params?: Record<string, unknown>) =>
     ["webhooks", id, "deliveries", params] as const,
   webhookEvents: ["webhooks", "events"] as const,
 
-  // Billing
-  subscription: ["billing", "subscription"] as const,
+  // Billing (org-scoped)
+  subscription: (orgId: string) => ["billing", "subscription", orgId] as const,
   plans: ["billing", "plans"] as const,
-  invoices: ["billing", "invoices"] as const,
+  invoices: (orgId: string) => ["billing", "invoices", orgId] as const,
 
   // Notifications
   notifications: ["notifications"] as const,
@@ -105,6 +105,6 @@ export const qk = {
   // Admin - Stats
   adminStats: ["admin-stats"] as const,
 
-  // SSO Config
-  ssoConfig: ["sso-config"] as const,
+  // SSO Config (org-scoped)
+  ssoConfig: (orgId: string) => ["sso-config", orgId] as const,
 } as const

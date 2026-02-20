@@ -263,7 +263,7 @@ export default function AcceptInvitationScreen() {
               size="lg"
               onPress={() => {
                 if (token) setPendingInvitationToken(token);
-                router.push('/(auth)/sign-in');
+                router.replace('/(auth)/sign-in');
               }}
             >
               {t('auth.signInToAccept')}

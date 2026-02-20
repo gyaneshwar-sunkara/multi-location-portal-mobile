@@ -1,7 +1,8 @@
 import * as SecureStore from 'expo-secure-store';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { mmkvStorage } from '@/lib/storage';
+import { mmkvStorage, clearPendingInvitationToken } from '@/lib/storage';
+import { API_URL } from '@/lib/config';
 import type { User, Membership } from '@/lib/types';
 
 // ── SecureStore Keys (encrypted) ────────────────────────────────────────────
@@ -112,8 +113,19 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
+        // Revoke server-side session (fire-and-forget)
+        const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+        if (refreshToken) {
+          fetch(`${API_URL}/auth/logout`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken }),
+          }).catch(() => {});
+        }
+
         await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
         await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
+        clearPendingInvitationToken();
 
         // persist middleware auto-writes cleared state to MMKV
         set({
