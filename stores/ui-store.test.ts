@@ -6,6 +6,7 @@ import { useUIStore, isRtl, SUPPORTED_LANGUAGES, RTL_LANGUAGES } from './ui-stor
 
 jest.mock('i18next', () => ({
   changeLanguage: jest.fn(),
+  t: jest.fn((key: string) => key),
 }));
 
 jest.spyOn(Alert, 'alert').mockImplementation(() => {});
