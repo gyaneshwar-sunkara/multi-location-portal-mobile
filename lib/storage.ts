@@ -1,3 +1,5 @@
+import * as Crypto from 'expo-crypto';
+import * as SecureStore from 'expo-secure-store';
 import { createMMKV } from 'react-native-mmkv';
 import type { StateStorage } from 'zustand/middleware';
 
@@ -10,6 +12,21 @@ export const mmkvStorage: StateStorage = {
   setItem: (name, value) => mmkv.set(name, value),
   removeItem: (name) => mmkv.remove(name),
 };
+
+// ── Trusted Device ID ───────────────────────────────────────────────────────
+// Persisted in SecureStore so it survives app reinstalls on iOS (Keychain).
+// Used when the user opts to trust a device during 2FA verification.
+
+const DEVICE_ID_KEY = 'trusted-device-id';
+
+export async function getOrCreateDeviceId(): Promise<string> {
+  let deviceId = await SecureStore.getItemAsync(DEVICE_ID_KEY);
+  if (!deviceId) {
+    deviceId = Crypto.randomUUID();
+    await SecureStore.setItemAsync(DEVICE_ID_KEY, deviceId);
+  }
+  return deviceId;
+}
 
 // ── Pending Invitation Token ────────────────────────────────────────────────
 // Stored when an unauthenticated user taps an invitation deep link.

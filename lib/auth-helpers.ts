@@ -25,9 +25,15 @@ export async function completeAuth(authResponse: AuthResponse): Promise<void> {
       activeOrgId = isDefaultValid
         ? defaultOrgId
         : (memberships[0]?.organizationId ?? null);
+    } else if (meResponse.status === 401) {
+      throw new Error('Authentication tokens are invalid');
     }
-  } catch {
-    // /auth/me failed — proceed with login, memberships can be fetched later
+  } catch (error) {
+    // Re-throw auth errors — tokens are invalid
+    if (error instanceof Error && error.message === 'Authentication tokens are invalid') {
+      throw error;
+    }
+    // Network/timeout errors — proceed with login, memberships can be fetched later
   }
 
   await useAuthStore.getState().setAuth(
@@ -88,7 +94,7 @@ export async function send2faOtp(
 
 export async function verify2faCode(
   method: 'totp' | 'email' | 'sms',
-  data: { challengeToken: string; code: string; trustDevice?: boolean },
+  data: { challengeToken: string; code: string; trustDevice?: boolean; deviceId?: string },
 ): Promise<{ auth?: AuthResponse; error?: string }> {
   const endpointMap = {
     totp: '/auth/2fa/totp/verify',

@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -280,30 +281,33 @@ export default function NotificationsScreen() {
   // ── Empty state ───────────────────────────────────────────────────────
   if (!isLoading && notifications.length === 0) {
     return (
-      <View
-        style={[
-          styles.empty,
-          { backgroundColor: theme.colors.background, padding: theme.spacing.lg },
-        ]}
-      >
-        <View style={[styles.emptyIcon, { backgroundColor: theme.colors.muted }]}>
-          <Ionicons
-            name="notifications-outline"
-            size={32}
-            color={theme.colors.mutedForeground}
-          />
+      <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+        <View
+          style={[
+            styles.empty,
+            { backgroundColor: theme.colors.background, padding: theme.spacing.lg },
+          ]}
+        >
+          <View style={[styles.emptyIcon, { backgroundColor: theme.colors.muted }]}>
+            <Ionicons
+              name="notifications-outline"
+              size={32}
+              color={theme.colors.mutedForeground}
+            />
+          </View>
+          <Text variant="body" color={theme.colors.mutedForeground} style={styles.textCenter}>
+            {t('notifications.empty')}
+          </Text>
+          <Text variant="caption" color={theme.colors.mutedForeground} style={styles.textCenter}>
+            {t('notifications.emptyDescription')}
+          </Text>
         </View>
-        <Text variant="body" color={theme.colors.mutedForeground} style={styles.textCenter}>
-          {t('notifications.empty')}
-        </Text>
-        <Text variant="caption" color={theme.colors.mutedForeground} style={styles.textCenter}>
-          {t('notifications.emptyDescription')}
-        </Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
     <FlatList
       data={notifications}
       keyExtractor={(item) => item.id}
@@ -337,6 +341,7 @@ export default function NotificationsScreen() {
         ) : null
       }
     />
+    </SafeAreaView>
   );
 }
 

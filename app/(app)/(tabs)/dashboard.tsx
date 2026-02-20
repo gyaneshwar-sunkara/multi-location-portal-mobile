@@ -6,6 +6,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
@@ -76,9 +77,11 @@ export default function DashboardScreen() {
 
   if (isLoading) {
     return (
-      <View style={[styles.loader, { backgroundColor: theme.colors.background }]}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-      </View>
+      <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+        <View style={[styles.loader, { backgroundColor: theme.colors.background }]}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -88,6 +91,7 @@ export default function DashboardScreen() {
   const orgCount = (me?.memberships ?? memberships).length;
 
   return (
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       contentContainerStyle={[
@@ -285,6 +289,7 @@ export default function DashboardScreen() {
         </CardContent>
       </Card>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

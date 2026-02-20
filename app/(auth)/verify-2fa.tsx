@@ -14,7 +14,7 @@ import {
   verify2faCode,
   verifyRecoveryCode,
 } from '@/lib/auth-helpers';
-import { getPendingInvitationToken, clearPendingInvitationToken } from '@/lib/storage';
+import { getPendingInvitationToken, clearPendingInvitationToken, getOrCreateDeviceId } from '@/lib/storage';
 
 type TwoFactorMethod = 'totp' | 'email' | 'sms';
 type TabMode = 'code' | 'recovery';
@@ -152,10 +152,12 @@ export default function Verify2faScreen() {
     setServerError('');
     setIsVerifying(true);
     try {
+      const deviceId = trustDevice ? await getOrCreateDeviceId() : undefined;
       const result = await verify2faCode(selectedMethod, {
         challengeToken,
         code,
         trustDevice,
+        ...(deviceId && { deviceId }),
       });
       if (result.error) {
         setServerError(result.error);

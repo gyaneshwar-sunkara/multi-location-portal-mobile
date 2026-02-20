@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Pressable, StyleSheet, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -163,6 +164,7 @@ export default function SettingsScreen() {
     : undefined;
 
   return (
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       contentContainerStyle={[
@@ -287,6 +289,7 @@ export default function SettingsScreen() {
         </View>
       ))}
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
