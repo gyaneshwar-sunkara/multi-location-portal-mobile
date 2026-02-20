@@ -8,8 +8,10 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
+import i18n from '@/i18n';
 
 const STALE_TIME_MS = 5 * 60 * 1000; // 5 minutes
+const GC_TIME_MS = 15 * 60 * 1000; // 15 minutes — keep unused data in cache longer on mobile
 const MAX_RETRY_DELAY_MS = 10_000;
 
 function isNetworkError(error: unknown): boolean {
@@ -44,24 +46,25 @@ function makeQueryClient() {
 
         // Show alert for other errors (already localized by API)
         const message =
-          error instanceof Error ? error.message : 'An unexpected error occurred';
-        Alert.alert('Error', message);
+          error instanceof Error ? error.message : i18n.t('errorState.genericDescription');
+        Alert.alert(i18n.t('errorState.genericTitle'), message);
       },
     }),
     defaultOptions: {
       queries: {
         staleTime: STALE_TIME_MS,
+        gcTime: GC_TIME_MS,
         retry: (failureCount, error) => {
           const status = getErrorStatus(error);
 
-          // Don't retry auth errors
-          if (status === 401) return false;
+          // Don't retry client errors (4xx) — these won't resolve on retry
+          if (status && status >= 400 && status < 500) return false;
 
           // Network errors: retry up to 3 times with backoff
           if (isNetworkError(error)) return failureCount < 3;
 
-          // Other errors: retry once
-          return failureCount < 1;
+          // Server errors (5xx) or unknown: retry up to 2 times
+          return failureCount < 2;
         },
         retryDelay: (attemptIndex) =>
           Math.min(1000 * 2 ** attemptIndex, MAX_RETRY_DELAY_MS),

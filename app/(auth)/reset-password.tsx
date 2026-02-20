@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { z } from 'zod';
 
 import { useAppTheme } from '@/providers/theme-provider';
+import { useAuthStore } from '@/stores/auth-store';
 import { AuthScreenLayout } from '@/components/auth/AuthScreenLayout';
 import { BrandHeader } from '@/components/auth/BrandHeader';
 import { PasswordInput } from '@/components/auth/PasswordInput';
@@ -32,6 +33,12 @@ export default function ResetPasswordScreen() {
   const { theme } = useAppTheme();
   const router = useRouter();
   const { token } = useLocalSearchParams<{ token?: string }>();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  // Redirect authenticated users to the app home screen
+  if (isAuthenticated) {
+    return <Redirect href="/(app)" />;
+  }
 
   const [serverError, setServerError] = useState('');
   const [isLoading, setIsLoading] = useState(false);

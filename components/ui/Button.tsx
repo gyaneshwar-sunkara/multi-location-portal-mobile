@@ -70,7 +70,7 @@ function getSizeStyles(size: ButtonSize): { container: ViewStyle; text: TextStyl
   switch (size) {
     case 'sm':
       return {
-        container: { height: 36, paddingHorizontal: 12 },
+        container: { height: 44, paddingHorizontal: 12 }, // 44px minimum for Apple HIG touch target
         text: { fontSize: 13 },
       };
     case 'default':
@@ -86,7 +86,7 @@ function getSizeStyles(size: ButtonSize): { container: ViewStyle; text: TextStyl
   }
 }
 
-export function Button({
+export const Button = React.memo(function Button({
   variant = 'default',
   size = 'default',
   loading = false,
@@ -127,4 +127,4 @@ export function Button({
       )}
     </Pressable>
   );
-}
+});

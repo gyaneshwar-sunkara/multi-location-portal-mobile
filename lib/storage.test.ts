@@ -29,18 +29,18 @@ describe('mmkvStorage adapter', () => {
 });
 
 describe('pending invitation token', () => {
-  it('stores and retrieves an invitation token', () => {
-    setPendingInvitationToken('invite-abc');
-    expect(getPendingInvitationToken()).toBe('invite-abc');
+  it('stores and retrieves an invitation token', async () => {
+    await setPendingInvitationToken('invite-abc');
+    expect(await getPendingInvitationToken()).toBe('invite-abc');
   });
 
-  it('returns null when no token is stored', () => {
-    expect(getPendingInvitationToken()).toBeNull();
+  it('returns null when no token is stored', async () => {
+    expect(await getPendingInvitationToken()).toBeNull();
   });
 
-  it('clears the stored token', () => {
-    setPendingInvitationToken('invite-abc');
-    clearPendingInvitationToken();
-    expect(getPendingInvitationToken()).toBeNull();
+  it('clears the stored token', async () => {
+    await setPendingInvitationToken('invite-abc');
+    await clearPendingInvitationToken();
+    expect(await getPendingInvitationToken()).toBeNull();
   });
 });

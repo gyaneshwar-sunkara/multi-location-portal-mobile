@@ -303,7 +303,13 @@
     "deleteOrgConfirm": "حذف المؤسسة",
     "confirmPassword": "أدخل كلمة المرور للتأكيد",
     "deleting": "جارٍ الحذف...",
-    "orgDeleted": "تم حذف المؤسسة."
+    "orgDeleted": "تم حذف المؤسسة.",
+    "createOrganization": "إنشاء مؤسسة",
+    "createOrgDescription": "أنشئ مؤسسة جديدة للتعاون مع فريقك.",
+    "orgNamePlaceholder": "مؤسستي",
+    "orgSlugPlaceholder": "my-organization",
+    "creating": "جارٍ الإنشاء...",
+    "orgCreated": "تم إنشاء المؤسسة بنجاح."
   },
   "admin": {
     "title": "الإدارة",
@@ -349,5 +355,40 @@
     "channelMarketing": "التسويق وتحديثات المنتج",
     "pushPermissionDenied": "الإشعارات الفورية معطلة. فعّلها في إعدادات جهازك.",
     "pushPermissionSettings": "فتح الإعدادات"
+  },
+  "security": {
+    "title": "الأمان",
+    "description": "إدارة المصادقة الثنائية ورموز الاسترداد والأجهزة الموثوقة.",
+    "twoFactor": "المصادقة الثنائية",
+    "twoFactorDescription": "أضف طبقة حماية إضافية لحسابك.",
+    "twoFactorEnabled": "المصادقة الثنائية مُفعّلة.",
+    "twoFactorDisabled": "المصادقة الثنائية غير مُفعّلة.",
+    "setupTotp": "إعداد المصادقة",
+    "settingUpTotp": "جارٍ الإعداد...",
+    "scanQrCode": "امسح رمز QR باستخدام تطبيق المصادقة.",
+    "enterTotpCode": "أدخل الرمز المكون من 6 أرقام من تطبيق المصادقة لإكمال الإعداد.",
+    "totpSetupComplete": "تم تفعيل المصادقة الثنائية بنجاح!",
+    "saveRecoveryCodes": "احفظ رموز الاسترداد في مكان آمن. ستحتاجها إذا فقدت الوصول إلى تطبيق المصادقة.",
+    "recoveryCodes": "رموز الاسترداد",
+    "recoveryCodesRemaining": "{{count}} رموز استرداد متبقية",
+    "regenerateCodes": "إعادة إنشاء الرموز",
+    "regeneratingCodes": "جارٍ إعادة الإنشاء...",
+    "regenerateCodesConfirm": "سيتم إلغاء جميع رموز الاسترداد الحالية. هل أنت متأكد؟",
+    "codesRegenerated": "تم إعادة إنشاء رموز الاسترداد.",
+    "trustedDevices": "الأجهزة الموثوقة",
+    "noTrustedDevices": "لا توجد أجهزة موثوقة.",
+    "revokeDevice": "إلغاء",
+    "revokeDeviceConfirm": "إزالة هذا الجهاز من قائمة الموثوقين؟",
+    "deviceRevoked": "تم إزالة الجهاز الموثوق.",
+    "currentDevice": "الحالي",
+    "expiresAt": "ينتهي {{date}}"
+  },
+  "errorBoundary": {
+    "title": "حدث خطأ ما",
+    "description": "حدث خطأ غير متوقع في هذا القسم.",
+    "retry": "إعادة المحاولة"
+  },
+  "offline": {
+    "message": "أنت غير متصل حالياً"
   }
 }

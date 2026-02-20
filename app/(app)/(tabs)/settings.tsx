@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Pressable, StyleSheet, ScrollView } from 'react-native';
+import React, { useMemo } from 'react';
+import { I18nManager, View, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -41,7 +41,7 @@ export default function SettingsScreen() {
   const language = useUIStore((s) => s.language);
   const colorScheme = useUIStore((s) => s.colorScheme);
 
-  const sections: { title: string; items: SettingsItem[] }[] = [
+  const sections: { title: string; items: SettingsItem[] }[] = useMemo(() => [
     {
       title: t('common.personal'),
       items: [
@@ -68,6 +68,15 @@ export default function SettingsScreen() {
           icon: 'lock-closed-outline',
           label: t('settings.password.title'),
           onPress: () => router.push('/(app)/settings/change-password'),
+        },
+        {
+          key: 'security',
+          icon: 'shield-checkmark-outline',
+          label: t('security.title'),
+          value: user?.twoFactorEnabled
+            ? t('common.enabled')
+            : t('common.disabled'),
+          onPress: () => router.push('/(app)/settings/security'),
         },
         {
           key: 'notification-preferences',
@@ -157,7 +166,7 @@ export default function SettingsScreen() {
         },
       ],
     },
-  ];
+  ], [t, user, isOrgAdmin, language, colorScheme, router, logout]);
 
   const fullName = user
     ? [user.firstName, user.lastName].filter(Boolean).join(' ')
@@ -277,7 +286,7 @@ export default function SettingsScreen() {
                   )}
                   {!item.destructive && (
                     <Ionicons
-                      name="chevron-forward"
+                      name={I18nManager.isRTL ? 'chevron-back' : 'chevron-forward'}
                       size={16}
                       color={theme.colors.mutedForeground}
                     />

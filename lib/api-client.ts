@@ -1,3 +1,6 @@
+// TODO: Generate a typed API client from api-nest's OpenAPI/Swagger spec
+// (e.g., using openapi-typescript-codegen or orval). This would replace manual
+// apiFetch calls with typed methods and eliminate field-name mismatches.
 import { API_URL } from '@/lib/config';
 import { useAuthStore } from '@/stores/auth-store';
 import { useUIStore } from '@/stores/ui-store';
@@ -66,7 +69,8 @@ export async function apiFetch(
   let { accessToken } = authState;
 
   if (!accessToken) {
-    await authState.logout();
+    // No token available — likely a storage/hydration issue or already logged out.
+    // Don't aggressively logout here; throw so the caller can handle gracefully.
     throw new Error('No access token');
   }
 
@@ -82,7 +86,8 @@ export async function apiFetch(
 
   const response = await makeAuthenticatedRequest(path, accessToken, options);
 
-  // Reactive 401 handling — covers server-side token invalidation
+  // Reactive 401 handling — covers server-side token invalidation.
+  // Only logout on 401 after refresh failure — never on 5xx or other errors.
   if (response.status === 401) {
     const refreshed = await refreshTokens();
     if (!refreshed) {

@@ -8,7 +8,7 @@ interface TextProps extends RNTextProps {
   color?: string;
 }
 
-export function Text({ variant = 'body', color, style, ...props }: TextProps) {
+export const Text = React.memo(function Text({ variant = 'body', color, style, ...props }: TextProps) {
   const { theme } = useAppTheme();
   const preset = typography[variant];
 
@@ -27,4 +27,4 @@ export function Text({ variant = 'body', color, style, ...props }: TextProps) {
       {...props}
     />
   );
-}
+});

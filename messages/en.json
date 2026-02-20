@@ -303,7 +303,13 @@
     "deleteOrgConfirm": "Delete Organization",
     "confirmPassword": "Enter your password to confirm",
     "deleting": "Deleting...",
-    "orgDeleted": "Organization deleted."
+    "orgDeleted": "Organization deleted.",
+    "createOrganization": "Create Organization",
+    "createOrgDescription": "Create a new organization to collaborate with your team.",
+    "orgNamePlaceholder": "My Organization",
+    "orgSlugPlaceholder": "my-organization",
+    "creating": "Creating...",
+    "orgCreated": "Organization created successfully."
   },
   "admin": {
     "title": "Administration",
@@ -349,5 +355,40 @@
     "channelMarketing": "Marketing & product updates",
     "pushPermissionDenied": "Push notifications are disabled. Enable them in your device settings.",
     "pushPermissionSettings": "Open Settings"
+  },
+  "security": {
+    "title": "Security",
+    "description": "Manage two-factor authentication, recovery codes, and trusted devices.",
+    "twoFactor": "Two-Factor Authentication",
+    "twoFactorDescription": "Add an extra layer of security to your account.",
+    "twoFactorEnabled": "Two-factor authentication is enabled.",
+    "twoFactorDisabled": "Two-factor authentication is not enabled.",
+    "setupTotp": "Set Up Authenticator",
+    "settingUpTotp": "Setting up...",
+    "scanQrCode": "Scan this QR code with your authenticator app.",
+    "enterTotpCode": "Enter the 6-digit code from your authenticator app to complete setup.",
+    "totpSetupComplete": "Two-factor authentication enabled successfully!",
+    "saveRecoveryCodes": "Save your recovery codes in a safe place. You will need them if you lose access to your authenticator app.",
+    "recoveryCodes": "Recovery Codes",
+    "recoveryCodesRemaining": "{{count}} recovery codes remaining",
+    "regenerateCodes": "Regenerate Codes",
+    "regeneratingCodes": "Regenerating...",
+    "regenerateCodesConfirm": "This will invalidate all existing recovery codes. Are you sure?",
+    "codesRegenerated": "Recovery codes regenerated.",
+    "trustedDevices": "Trusted Devices",
+    "noTrustedDevices": "No trusted devices.",
+    "revokeDevice": "Revoke",
+    "revokeDeviceConfirm": "Remove this device from the trusted list?",
+    "deviceRevoked": "Trusted device removed.",
+    "currentDevice": "Current",
+    "expiresAt": "Expires {{date}}"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred in this section.",
+    "retry": "Try Again"
+  },
+  "offline": {
+    "message": "You are currently offline"
   }
 }

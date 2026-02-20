@@ -60,9 +60,9 @@ export default function SignInScreen() {
     await completeAuth(result);
 
     // If there's a pending invitation, redirect to accept it instead of dashboard
-    const pendingToken = getPendingInvitationToken();
+    const pendingToken = await getPendingInvitationToken();
     if (pendingToken) {
-      clearPendingInvitationToken();
+      await clearPendingInvitationToken();
       router.replace({
         pathname: '/(auth)/accept-invitation',
         params: { token: pendingToken },
@@ -82,6 +82,7 @@ export default function SignInScreen() {
       const idToken = result.data?.idToken;
       if (!idToken) return;
 
+      // Field name `idToken` matches api-nest GoogleLoginDto (auth.dto.ts)
       const response = await apiPublicFetch('/auth/google', {
         method: 'POST',
         body: JSON.stringify({ idToken }),
@@ -110,6 +111,7 @@ export default function SignInScreen() {
 
       if (!credential.identityToken) return;
 
+      // Field names `identityToken` + `user.firstName/lastName` match api-nest AppleLoginDto (auth.dto.ts)
       const response = await apiPublicFetch('/auth/apple', {
         method: 'POST',
         body: JSON.stringify({

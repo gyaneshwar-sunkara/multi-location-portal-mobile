@@ -74,9 +74,9 @@ export default function RegisterScreen() {
     await completeAuth(result);
 
     // If there's a pending invitation, redirect to accept it instead of dashboard
-    const pendingToken = getPendingInvitationToken();
+    const pendingToken = await getPendingInvitationToken();
     if (pendingToken) {
-      clearPendingInvitationToken();
+      await clearPendingInvitationToken();
       router.replace({
         pathname: '/(auth)/accept-invitation',
         params: { token: pendingToken },

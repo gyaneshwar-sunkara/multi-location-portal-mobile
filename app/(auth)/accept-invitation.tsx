@@ -261,8 +261,8 @@ export default function AcceptInvitationScreen() {
           <>
             <Button
               size="lg"
-              onPress={() => {
-                if (token) setPendingInvitationToken(token);
+              onPress={async () => {
+                if (token) await setPendingInvitationToken(token);
                 router.replace('/(auth)/sign-in');
               }}
             >
@@ -271,8 +271,8 @@ export default function AcceptInvitationScreen() {
             <Button
               variant="outline"
               size="lg"
-              onPress={() => {
-                if (token) setPendingInvitationToken(token);
+              onPress={async () => {
+                if (token) await setPendingInvitationToken(token);
                 router.push('/(auth)/register');
               }}
             >

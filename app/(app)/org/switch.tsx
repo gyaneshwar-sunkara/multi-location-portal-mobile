@@ -1,11 +1,13 @@
-import { View, Pressable, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Pressable, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAppTheme } from '@/providers/theme-provider';
 import { useAuthStore } from '@/stores/auth-store';
-import { Text } from '@/components/ui';
+import { Text, Button } from '@/components/ui';
+import { refreshMemberships } from '@/lib/auth-helpers';
 
 const AVATAR_COLORS = [
   '#6366F1', '#8B5CF6', '#EC4899', '#F43F5E',
@@ -33,6 +35,13 @@ export default function OrgSwitchScreen() {
   const memberships = useAuthStore((s) => s.memberships);
   const activeOrganizationId = useAuthStore((s) => s.activeOrganizationId);
   const setActiveOrganization = useAuthStore((s) => s.setActiveOrganization);
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await refreshMemberships();
+    setIsRefreshing(false);
+  }, []);
 
   function handleSelect(orgId: string) {
     setActiveOrganization(orgId);
@@ -66,6 +75,13 @@ export default function OrgSwitchScreen() {
         >
           {t('common.organizations')}
         </Text>
+        <Button
+          variant="outline"
+          size="lg"
+          onPress={() => router.push('/(app)/org/create')}
+        >
+          {t('org.createOrganization')}
+        </Button>
       </View>
     );
   }
@@ -77,6 +93,9 @@ export default function OrgSwitchScreen() {
         styles.container,
         { padding: theme.spacing.lg },
       ]}
+      refreshControl={
+        <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+      }
     >
       <View
         style={[
@@ -155,6 +174,16 @@ export default function OrgSwitchScreen() {
           );
         })}
       </View>
+
+      {/* Create Organization Button */}
+      <Button
+        variant="outline"
+        size="lg"
+        onPress={() => router.push('/(app)/org/create')}
+        style={{ marginTop: theme.spacing.sm }}
+      >
+        {t('org.createOrganization')}
+      </Button>
     </ScrollView>
   );
 }

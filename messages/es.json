@@ -303,7 +303,13 @@
     "deleteOrgConfirm": "Eliminar Organización",
     "confirmPassword": "Ingresa tu contraseña para confirmar",
     "deleting": "Eliminando...",
-    "orgDeleted": "Organización eliminada."
+    "orgDeleted": "Organización eliminada.",
+    "createOrganization": "Crear Organización",
+    "createOrgDescription": "Crea una nueva organización para colaborar con tu equipo.",
+    "orgNamePlaceholder": "Mi Organización",
+    "orgSlugPlaceholder": "mi-organizacion",
+    "creating": "Creando...",
+    "orgCreated": "Organización creada correctamente."
   },
   "admin": {
     "title": "Administración",
@@ -349,5 +355,40 @@
     "channelMarketing": "Marketing y actualizaciones del producto",
     "pushPermissionDenied": "Las notificaciones push están deshabilitadas. Habilítalas en la configuración de tu dispositivo.",
     "pushPermissionSettings": "Abrir Configuración"
+  },
+  "security": {
+    "title": "Seguridad",
+    "description": "Administra la autenticación de dos factores, códigos de recuperación y dispositivos de confianza.",
+    "twoFactor": "Autenticación de Dos Factores",
+    "twoFactorDescription": "Agrega una capa adicional de seguridad a tu cuenta.",
+    "twoFactorEnabled": "La autenticación de dos factores está habilitada.",
+    "twoFactorDisabled": "La autenticación de dos factores no está habilitada.",
+    "setupTotp": "Configurar Autenticador",
+    "settingUpTotp": "Configurando...",
+    "scanQrCode": "Escanea este código QR con tu aplicación de autenticación.",
+    "enterTotpCode": "Ingresa el código de 6 dígitos de tu aplicación de autenticación para completar la configuración.",
+    "totpSetupComplete": "¡Autenticación de dos factores habilitada correctamente!",
+    "saveRecoveryCodes": "Guarda tus códigos de recuperación en un lugar seguro. Los necesitarás si pierdes acceso a tu aplicación de autenticación.",
+    "recoveryCodes": "Códigos de Recuperación",
+    "recoveryCodesRemaining": "{{count}} códigos de recuperación restantes",
+    "regenerateCodes": "Regenerar Códigos",
+    "regeneratingCodes": "Regenerando...",
+    "regenerateCodesConfirm": "Esto invalidará todos los códigos de recuperación existentes. ¿Estás seguro?",
+    "codesRegenerated": "Códigos de recuperación regenerados.",
+    "trustedDevices": "Dispositivos de Confianza",
+    "noTrustedDevices": "No hay dispositivos de confianza.",
+    "revokeDevice": "Revocar",
+    "revokeDeviceConfirm": "¿Eliminar este dispositivo de la lista de confianza?",
+    "deviceRevoked": "Dispositivo de confianza eliminado.",
+    "currentDevice": "Actual",
+    "expiresAt": "Expira {{date}}"
+  },
+  "errorBoundary": {
+    "title": "Algo salió mal",
+    "description": "Ocurrió un error inesperado en esta sección.",
+    "retry": "Reintentar"
+  },
+  "offline": {
+    "message": "Actualmente no tienes conexión"
   }
 }

@@ -103,9 +103,21 @@ export const useAuthStore = create<AuthState>()(
             isHydrated: true,
           });
         } else {
+          // Validate that the saved activeOrganizationId still exists in memberships.
+          // If the user was removed from the org while offline, reset to first available.
+          const { memberships: hydratedMemberships, activeOrganizationId: savedOrgId } =
+            useAuthStore.getState();
+          const isOrgValid =
+            savedOrgId &&
+            hydratedMemberships.some((m) => m.organizationId === savedOrgId);
+          const validOrgId = isOrgValid
+            ? savedOrgId
+            : (hydratedMemberships[0]?.organizationId ?? null);
+
           set({
             accessToken,
             refreshToken,
+            activeOrganizationId: validOrgId,
             isAuthenticated: true,
             isHydrated: true,
           });
@@ -125,7 +137,7 @@ export const useAuthStore = create<AuthState>()(
 
         await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
         await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
-        clearPendingInvitationToken();
+        await clearPendingInvitationToken();
 
         // persist middleware auto-writes cleared state to MMKV
         set({

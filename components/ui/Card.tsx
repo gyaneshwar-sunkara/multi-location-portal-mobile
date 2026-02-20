@@ -10,7 +10,7 @@ function isTextContent(children: React.ReactNode): boolean {
   return false;
 }
 
-export function Card({ style, ...props }: ViewProps) {
+export const Card = React.memo(function Card({ style, ...props }: ViewProps) {
   const { theme } = useAppTheme();
 
   return (
@@ -30,12 +30,12 @@ export function Card({ style, ...props }: ViewProps) {
       {...props}
     />
   );
-}
+});
 
-export function CardHeader({ style, ...props }: ViewProps) {
+export const CardHeader = React.memo(function CardHeader({ style, ...props }: ViewProps) {
   const { theme } = useAppTheme();
   return <View style={[{ paddingHorizontal: theme.spacing.lg, gap: theme.spacing.xs }, style]} {...props} />;
-}
+});
 
 interface CardTextProps extends ViewProps {
   children: string | React.ReactNode;
@@ -67,12 +67,12 @@ export function CardDescription({ style, children, ...props }: CardTextProps) {
   );
 }
 
-export function CardContent({ style, ...props }: ViewProps) {
+export const CardContent = React.memo(function CardContent({ style, ...props }: ViewProps) {
   const { theme } = useAppTheme();
   return <View style={[{ paddingHorizontal: theme.spacing.lg }, style]} {...props} />;
-}
+});
 
-export function CardFooter({ style, ...props }: ViewProps) {
+export const CardFooter = React.memo(function CardFooter({ style, ...props }: ViewProps) {
   const { theme } = useAppTheme();
   return (
     <View
@@ -80,4 +80,4 @@ export function CardFooter({ style, ...props }: ViewProps) {
       {...props}
     />
   );
-}
+});

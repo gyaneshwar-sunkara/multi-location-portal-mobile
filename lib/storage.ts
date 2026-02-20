@@ -32,17 +32,18 @@ export async function getOrCreateDeviceId(): Promise<string> {
 // Stored when an unauthenticated user taps an invitation deep link.
 // After sign-in/register succeeds, the app checks for this and redirects
 // to the accept-invitation screen instead of the dashboard.
+// Stored in SecureStore for better security (invitation tokens are sensitive).
 
 const PENDING_INVITATION_KEY = 'pending-invitation-token';
 
-export function setPendingInvitationToken(token: string): void {
-  mmkv.set(PENDING_INVITATION_KEY, token);
+export async function setPendingInvitationToken(token: string): Promise<void> {
+  await SecureStore.setItemAsync(PENDING_INVITATION_KEY, token);
 }
 
-export function getPendingInvitationToken(): string | null {
-  return mmkv.getString(PENDING_INVITATION_KEY) ?? null;
+export async function getPendingInvitationToken(): Promise<string | null> {
+  return await SecureStore.getItemAsync(PENDING_INVITATION_KEY);
 }
 
-export function clearPendingInvitationToken(): void {
-  mmkv.remove(PENDING_INVITATION_KEY);
+export async function clearPendingInvitationToken(): Promise<void> {
+  await SecureStore.deleteItemAsync(PENDING_INVITATION_KEY);
 }

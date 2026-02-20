@@ -1,10 +1,11 @@
-import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   FlatList,
   Pressable,
   Alert,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
@@ -16,8 +17,9 @@ import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { Swipeable } from 'react-native-gesture-handler';
 
 import { useAppTheme } from '@/providers/theme-provider';
-import { Text } from '@/components/ui';
+import { Text, Skeleton } from '@/components/ui';
 import { Badge } from '@/components/ui/Badge';
+import { ErrorState } from '@/components/ErrorState';
 import { apiFetch } from '@/lib/api-client';
 import { parseApiError } from '@/lib/api-error';
 import { qk } from '@/lib/query-keys';
@@ -46,6 +48,7 @@ export default function NotificationsScreen() {
   const {
     data,
     isLoading,
+    isError,
     isRefetching,
     refetch,
     fetchNextPage,
@@ -72,7 +75,10 @@ export default function NotificationsScreen() {
     initialPageParam: 0,
   });
 
-  const notifications = data?.pages.flatMap((p) => p.data) ?? [];
+  const notifications = useMemo(
+    () => data?.pages.flatMap((p) => p.data) ?? [],
+    [data?.pages],
+  );
   const hasUnread = notifications.some((n) => !n.readAt);
 
   // ── Mark as read ───────────────────────────────────────────────────────
@@ -278,15 +284,28 @@ export default function NotificationsScreen() {
     [actionId, theme, renderRightActions, t],
   );
 
+  // ── Error state ──────────────────────────────────────────────────────
+  if (isError) {
+    return (
+      <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+        <ErrorState onRetry={() => refetch()} />
+      </SafeAreaView>
+    );
+  }
+
   // ── Empty state ───────────────────────────────────────────────────────
   if (!isLoading && notifications.length === 0) {
     return (
       <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-        <View
-          style={[
+        <ScrollView
+          contentContainerStyle={[
             styles.empty,
             { backgroundColor: theme.colors.background, padding: theme.spacing.lg },
           ]}
+          style={{ flex: 1, backgroundColor: theme.colors.background }}
+          refreshControl={
+            <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+          }
         >
           <View style={[styles.emptyIcon, { backgroundColor: theme.colors.muted }]}>
             <Ionicons
@@ -301,7 +320,7 @@ export default function NotificationsScreen() {
           <Text variant="caption" color={theme.colors.mutedForeground} style={styles.textCenter}>
             {t('notifications.emptyDescription')}
           </Text>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -312,6 +331,9 @@ export default function NotificationsScreen() {
       data={notifications}
       keyExtractor={(item) => item.id}
       renderItem={renderNotification}
+      initialNumToRender={15}
+      maxToRenderPerBatch={10}
+      windowSize={5}
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       contentContainerStyle={{ paddingVertical: theme.spacing.sm }}
       ItemSeparatorComponent={() => (
@@ -337,7 +359,17 @@ export default function NotificationsScreen() {
       }
       ListEmptyComponent={
         isLoading ? (
-          <ActivityIndicator style={{ marginTop: theme.spacing.xl }} />
+          <View style={{ padding: theme.spacing.md, gap: theme.spacing.md }}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <Skeleton width={36} height={36} borderRadius={18} />
+                <View style={{ flex: 1, gap: 6 }}>
+                  <Skeleton height={14} width="80%" />
+                  <Skeleton height={10} width="50%" />
+                </View>
+              </View>
+            ))}
+          </View>
         ) : null
       }
     />

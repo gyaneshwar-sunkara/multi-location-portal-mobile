@@ -75,10 +75,10 @@ export default function Verify2faScreen() {
 
   const needsOtpSend = selectedMethod === 'email' || selectedMethod === 'sms';
 
-  function navigateAfterAuth() {
-    const pendingToken = getPendingInvitationToken();
+  async function navigateAfterAuth() {
+    const pendingToken = await getPendingInvitationToken();
     if (pendingToken) {
-      clearPendingInvitationToken();
+      await clearPendingInvitationToken();
       router.replace({
         pathname: '/(auth)/accept-invitation',
         params: { token: pendingToken },

@@ -16,7 +16,7 @@ interface OptionSheetProps<T> {
   onClose: () => void;
 }
 
-export function OptionSheet<T>({
+function OptionSheetInner<T>({
   visible,
   title,
   options,
@@ -110,6 +110,9 @@ export function OptionSheet<T>({
     </Modal>
   );
 }
+
+// React.memo for generic components requires a cast
+export const OptionSheet = React.memo(OptionSheetInner) as typeof OptionSheetInner;
 
 const styles = StyleSheet.create({
   backdrop: {

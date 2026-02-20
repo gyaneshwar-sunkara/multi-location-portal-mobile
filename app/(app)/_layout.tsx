@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/providers/auth-provider';
 import { useAppTheme } from '@/providers/theme-provider';
 import { usePushNotifications } from '@/hooks/use-push-notifications';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export default function AppLayout() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -15,6 +16,7 @@ export default function AppLayout() {
   if (!isAuthenticated) return <Redirect href="/(auth)/sign-in" />;
 
   return (
+    <ErrorBoundary>
     <Stack
       key={user?.id}
       screenOptions={{
@@ -53,6 +55,10 @@ export default function AppLayout() {
         options={{ title: t('notifications.preferences'), headerBackTitle: t('common.settings') }}
       />
       <Stack.Screen
+        name="settings/security"
+        options={{ title: t('security.title'), headerBackTitle: t('common.settings') }}
+      />
+      <Stack.Screen
         name="org/members"
         options={{ title: t('org.members'), headerBackTitle: t('common.settings') }}
       />
@@ -69,9 +75,14 @@ export default function AppLayout() {
         options={{ title: t('common.switchOrganization'), headerBackTitle: t('common.settings') }}
       />
       <Stack.Screen
+        name="org/create"
+        options={{ title: t('org.createOrganization'), presentation: 'modal' }}
+      />
+      <Stack.Screen
         name="admin/dashboard"
         options={{ title: t('admin.title'), headerBackTitle: t('common.settings') }}
       />
     </Stack>
+    </ErrorBoundary>
   );
 }

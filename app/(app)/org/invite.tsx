@@ -30,6 +30,8 @@ export default function InviteMemberScreen() {
   const [roleSheetVisible, setRoleSheetVisible] = useState(false);
 
   // ── Fetch roles ────────────────────────────────────────────────────────
+  // GET /roles is org-scoped: api-nest resolves the org from the x-organization-id header
+  // (attached automatically by apiFetch via makeAuthenticatedRequest).
   const { data: rolesData } = useQuery({
     queryKey: qk.orgRoles(activeOrganizationId!),
     queryFn: async () => {
@@ -37,6 +39,7 @@ export default function InviteMemberScreen() {
       if (!res.ok) return { data: [] };
       return res.json() as Promise<{ data: OrgRole[] }>;
     },
+    enabled: !!activeOrganizationId,
   });
 
   const roles = rolesData?.data ?? [];

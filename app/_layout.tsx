@@ -11,6 +11,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { QueryProvider } from '@/providers/query-provider';
 import { AppThemeProvider } from '@/providers/theme-provider';
 import { AuthProvider } from '@/providers/auth-provider';
+import { OfflineBanner } from '@/components/OfflineBanner';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -22,6 +23,7 @@ export default function RootLayout() {
       <QueryProvider>
         <AppThemeProvider>
           <AuthProvider>
+            <OfflineBanner />
             <RootNavigator />
           </AuthProvider>
         </AppThemeProvider>

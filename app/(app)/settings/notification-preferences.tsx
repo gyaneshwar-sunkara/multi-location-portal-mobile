@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useAppTheme } from '@/providers/theme-provider';
 import { Text } from '@/components/ui';
+import { ErrorState } from '@/components/ErrorState';
 import { apiFetch } from '@/lib/api-client';
 import { parseApiError } from '@/lib/api-error';
 import { qk } from '@/lib/query-keys';
@@ -24,7 +25,7 @@ export default function NotificationPreferencesScreen() {
   const { theme } = useAppTheme();
   const queryClient = useQueryClient();
 
-  const { data: preferences, isLoading } = useQuery({
+  const { data: preferences, isLoading, isError, refetch } = useQuery({
     queryKey: qk.notificationsPreferences,
     queryFn: async () => {
       const res = await apiFetch('/notifications/preferences');
@@ -81,6 +82,10 @@ export default function NotificationPreferencesScreen() {
         <ActivityIndicator />
       </View>
     );
+  }
+
+  if (isError) {
+    return <ErrorState onRetry={() => refetch()} />;
   }
 
   function renderSection(title: string, items: ToggleItem[]) {

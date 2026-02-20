@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   View,
   FlatList,
@@ -94,7 +94,10 @@ export default function MembersScreen() {
     enabled: !!activeOrganizationId,
   });
 
-  const members = data?.pages.flatMap((p) => p.data) ?? [];
+  const members = useMemo(
+    () => data?.pages.flatMap((p) => p.data) ?? [],
+    [data?.pages],
+  );
 
   // ── Invitations query (admin only) ─────────────────────────────────────
   const { data: invitationsData } = useQuery({
@@ -376,6 +379,9 @@ export default function MembersScreen() {
       data={members}
       keyExtractor={(item) => item.userId}
       renderItem={renderMember}
+      initialNumToRender={15}
+      maxToRenderPerBatch={10}
+      windowSize={5}
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       contentContainerStyle={{ paddingVertical: theme.spacing.md }}
       ItemSeparatorComponent={() => (

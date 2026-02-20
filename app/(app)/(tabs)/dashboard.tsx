@@ -20,7 +20,9 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
+  Skeleton,
 } from '@/components/ui';
+import { ErrorState } from '@/components/ErrorState';
 import { apiFetch } from '@/lib/api-client';
 import { getInitials } from '@/lib/format';
 import { qk } from '@/lib/query-keys';
@@ -42,6 +44,7 @@ export default function DashboardScreen() {
   const {
     data: me,
     isLoading,
+    isError,
     isRefetching,
     refetch,
   } = useQuery({
@@ -64,8 +67,21 @@ export default function DashboardScreen() {
       store.setUser({ ...store.user, ...me });
     }
 
-    // Only update if store has stale/empty memberships
-    if (freshMemberships.length > 0 && store.memberships.length !== freshMemberships.length) {
+    // Deep-compare memberships before updating to prevent unnecessary re-renders.
+    // Compare org IDs + role names + org names as a lightweight but sufficient check.
+    const isSame =
+      freshMemberships.length === store.memberships.length &&
+      freshMemberships.every((fm, i) => {
+        const sm = store.memberships[i];
+        return (
+          sm &&
+          fm.organizationId === sm.organizationId &&
+          fm.roleName === sm.roleName &&
+          fm.organizationName === sm.organizationName
+        );
+      });
+
+    if (freshMemberships.length > 0 && !isSame) {
       useAuthStore.setState({ memberships: freshMemberships });
     }
 
@@ -78,9 +94,34 @@ export default function DashboardScreen() {
   if (isLoading) {
     return (
       <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-        <View style={[styles.loader, { backgroundColor: theme.colors.background }]}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
+        <View
+          style={[
+            styles.container,
+            { padding: theme.spacing.lg, gap: theme.spacing.lg, backgroundColor: theme.colors.background, flex: 1 },
+          ]}
+        >
+          {/* Profile skeleton */}
+          <View style={[styles.profileHeader, { gap: theme.spacing.md }]}>
+            <Skeleton width={56} height={56} borderRadius={28} />
+            <View style={{ flex: 1, gap: theme.spacing.xs }}>
+              <Skeleton width={160} height={20} />
+              <Skeleton width={120} height={14} />
+            </View>
+          </View>
+          {/* Card skeleton */}
+          <View style={{ gap: theme.spacing.md }}>
+            <Skeleton height={120} borderRadius={theme.radii.xl} />
+            <Skeleton height={140} borderRadius={theme.radii.xl} />
+          </View>
         </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isError) {
+    return (
+      <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+        <ErrorState onRetry={() => refetch()} />
       </SafeAreaView>
     );
   }

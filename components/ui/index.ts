@@ -11,3 +11,4 @@ export {
 } from './Card';
 export { Label } from './Label';
 export { OptionSheet } from './OptionSheet';
+export { Skeleton } from './Skeleton';

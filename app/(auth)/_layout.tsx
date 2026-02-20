@@ -2,6 +2,7 @@ import { Redirect, Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useAppTheme } from '@/providers/theme-provider';
 import { useAuthStore } from '@/stores/auth-store';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export default function AuthLayout() {
   const { theme } = useAppTheme();
@@ -15,6 +16,7 @@ export default function AuthLayout() {
   }
 
   return (
+    <ErrorBoundary>
     <Stack
       screenOptions={{
         headerShown: false,
@@ -77,5 +79,6 @@ export default function AuthLayout() {
         }}
       />
     </Stack>
+    </ErrorBoundary>
   );
 }
