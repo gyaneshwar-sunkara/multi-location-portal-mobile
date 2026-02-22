@@ -1,5 +1,7 @@
 // @ts-expect-error -- mock-only export from __mocks__/react-native-mmkv
 import { clearAllMockMMKV } from 'react-native-mmkv';
+// @ts-expect-error -- mock-only export from __mocks__/expo-secure-store
+import { clearMockSecureStore } from 'expo-secure-store';
 import {
   mmkvStorage,
   setPendingInvitationToken,
@@ -9,6 +11,7 @@ import {
 
 beforeEach(() => {
   clearAllMockMMKV();
+  clearMockSecureStore();
 });
 
 describe('mmkvStorage adapter', () => {

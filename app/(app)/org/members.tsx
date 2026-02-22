@@ -18,6 +18,7 @@ import { useAppTheme } from '@/providers/theme-provider';
 import { useAuthStore } from '@/stores/auth-store';
 import { Text } from '@/components/ui';
 import { Badge } from '@/components/ui/Badge';
+import { ErrorState } from '@/components/ErrorState';
 import { apiFetch } from '@/lib/api-client';
 import { parseApiError } from '@/lib/api-error';
 import { qk } from '@/lib/query-keys';
@@ -67,6 +68,8 @@ export default function MembersScreen() {
   const {
     data,
     isLoading,
+    isError,
+    error,
     isRefetching,
     refetch,
     fetchNextPage,
@@ -341,6 +344,16 @@ export default function MembersScreen() {
       </View>
     );
   }, [isOrgAdmin, invitations, isFetchingNextPage, theme, t]);
+
+  // ── Error state ────────────────────────────────────────────────────────
+  if (isError) {
+    return (
+      <>
+        <Stack.Screen options={{ headerRight }} />
+        <ErrorState message={error?.message} onRetry={() => refetch()} />
+      </>
+    );
+  }
 
   // ── Empty state ────────────────────────────────────────────────────────
   if (!isLoading && members.length === 0) {

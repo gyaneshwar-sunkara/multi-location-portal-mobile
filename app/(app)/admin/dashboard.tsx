@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '@/providers/theme-provider';
 import { useAuthStore } from '@/stores/auth-store';
 import { Text } from '@/components/ui';
+import { ErrorState } from '@/components/ErrorState';
 import { apiFetch } from '@/lib/api-client';
 import { qk } from '@/lib/query-keys';
 import { isPlatformUser } from '@/lib/permissions';
@@ -73,7 +74,7 @@ export default function AdminDashboardScreen() {
   const isAdmin = isPlatformUser(user?.platformRole);
 
   // Hooks must be called unconditionally — use `enabled` to skip the fetch
-  const { data: stats, isRefetching, refetch } = useQuery({
+  const { data: stats, isError, error, isRefetching, refetch } = useQuery({
     queryKey: qk.adminStats,
     queryFn: async () => {
       const res = await apiFetch('/admin/stats/overview');
@@ -86,6 +87,10 @@ export default function AdminDashboardScreen() {
   // Guard: redirect non-platform users
   if (!isAdmin) {
     return <Redirect href="/(app)/(tabs)/dashboard" />;
+  }
+
+  if (isError) {
+    return <ErrorState message={error?.message} onRetry={() => refetch()} />;
   }
 
   const cardWidth = (screenWidth - theme.spacing.lg * 2 - theme.spacing.md) / 2;
