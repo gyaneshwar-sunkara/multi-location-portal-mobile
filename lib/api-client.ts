@@ -1,9 +1,9 @@
 // TODO: Generate a typed API client from api-nest's OpenAPI/Swagger spec
 // (e.g., using openapi-typescript-codegen or orval). This would replace manual
 // apiFetch calls with typed methods and eliminate field-name mismatches.
-import { API_URL } from '@/lib/config';
-import { useAuthStore } from '@/stores/auth-store';
-import { useUIStore } from '@/stores/ui-store';
+import { API_URL } from "@/lib/config";
+import { useAuthStore } from "@/stores/auth-store";
+import { useUIStore } from "@/stores/ui-store";
 
 const TOKEN_EXPIRY_BUFFER_MS = 60_000; // Refresh 60s before actual expiry
 const REQUEST_TIMEOUT_MS = 30_000; // 30s request timeout
@@ -12,7 +12,7 @@ const REQUEST_TIMEOUT_MS = 30_000; // 30s request timeout
 
 function isTokenExpired(token: string): boolean {
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
+    const payload = JSON.parse(atob(token.split(".")[1]));
     return payload.exp * 1000 < Date.now() + TOKEN_EXPIRY_BUFFER_MS;
   } catch {
     return true;
@@ -34,15 +34,17 @@ async function refreshTokens(): Promise<boolean> {
       if (!refreshToken) return false;
 
       const response = await fetch(`${API_URL}/auth/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken }),
       });
 
       if (!response.ok) return false;
 
       const tokens = await response.json();
-      await useAuthStore.getState().setTokens(tokens.accessToken, tokens.refreshToken);
+      await useAuthStore
+        .getState()
+        .setTokens(tokens.accessToken, tokens.refreshToken);
       return true;
     } catch {
       return false;
@@ -71,7 +73,7 @@ export async function apiFetch(
   if (!accessToken) {
     // No token available — likely a storage/hydration issue or already logged out.
     // Don't aggressively logout here; throw so the caller can handle gracefully.
-    throw new Error('No access token');
+    throw new Error("No access token");
   }
 
   // Proactive refresh if token is about to expire
@@ -79,7 +81,7 @@ export async function apiFetch(
     const refreshed = await refreshTokens();
     if (!refreshed) {
       await useAuthStore.getState().logout();
-      throw new Error('Token refresh failed');
+      throw new Error("Token refresh failed");
     }
     accessToken = useAuthStore.getState().accessToken!;
   }
@@ -92,10 +94,14 @@ export async function apiFetch(
     const refreshed = await refreshTokens();
     if (!refreshed) {
       await useAuthStore.getState().logout();
-      throw new Error('Authentication failed');
+      throw new Error("Authentication failed");
     }
     // Retry once with new token
-    return makeAuthenticatedRequest(path, useAuthStore.getState().accessToken!, options);
+    return makeAuthenticatedRequest(
+      path,
+      useAuthStore.getState().accessToken!,
+      options,
+    );
   }
 
   return response;
@@ -125,19 +131,19 @@ function makeAuthenticatedRequest(
   const { language } = useUIStore.getState();
 
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
     Authorization: `Bearer ${accessToken}`,
-    'Accept-Language': language,
+    "Accept-Language": language,
   };
 
   if (activeOrganizationId) {
-    headers['x-organization-id'] = activeOrganizationId;
+    headers["x-organization-id"] = activeOrganizationId;
   }
 
   // Create timeout signal for React Native compatibility
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  
+
   // Use caller's signal if provided, otherwise use our timeout controller
   const signal = options.signal ?? controller.signal;
 
@@ -152,7 +158,7 @@ function makeAuthenticatedRequest(
 
   // Clear timeout on completion
   fetchPromise.finally(() => clearTimeout(timeoutId));
-  
+
   return fetchPromise;
 }
 
@@ -171,7 +177,7 @@ export async function apiPublicFetch(
   // Create timeout signal for React Native compatibility
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  
+
   // Use caller's signal if provided, otherwise use our timeout controller
   const signal = options.signal ?? controller.signal;
 
@@ -180,12 +186,12 @@ export async function apiPublicFetch(
       ...options,
       signal,
       headers: {
-        'Content-Type': 'application/json',
-        'Accept-Language': language,
+        "Content-Type": "application/json",
+        "Accept-Language": language,
         ...toHeadersRecord(options.headers),
       },
     });
-    
+
     clearTimeout(timeoutId);
     return response;
   } catch (error) {

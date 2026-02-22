@@ -1,31 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { View, Pressable, Platform, StyleSheet } from 'react-native';
-import * as SplashScreen from 'expo-splash-screen';
-import { useRouter, Link } from 'expo-router';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslation } from 'react-i18next';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import * as AppleAuthentication from 'expo-apple-authentication';
+import React, { useEffect, useState } from "react";
+import { View, Pressable, Platform, StyleSheet } from "react-native";
+import * as SplashScreen from "expo-splash-screen";
+import { useRouter, Link } from "expo-router";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import * as AppleAuthentication from "expo-apple-authentication";
 
-import { useAppTheme } from '@/providers/theme-provider';
-import { AuthScreenLayout } from '@/components/auth/AuthScreenLayout';
-import { BrandHeader } from '@/components/auth/BrandHeader';
-import { PasswordInput } from '@/components/auth/PasswordInput';
-import { SocialLoginButtons } from '@/components/auth/SocialLoginButtons';
-import { Text, Button, Input, Label } from '@/components/ui';
-import { loginSchema, type LoginInput } from '@/lib/validations/auth';
-import { apiPublicFetch } from '@/lib/api-client';
-import { parseApiError } from '@/lib/api-error';
-import { completeAuth } from '@/lib/auth-helpers';
-import { getPendingInvitationToken, clearPendingInvitationToken } from '@/lib/storage';
-import { isTwoFactorChallenge, type LoginResponse } from '@/lib/types';
+import { useAppTheme } from "@/providers/theme-provider";
+import { AuthScreenLayout } from "@/components/auth/AuthScreenLayout";
+import { BrandHeader } from "@/components/auth/BrandHeader";
+import { PasswordInput } from "@/components/auth/PasswordInput";
+import { SocialLoginButtons } from "@/components/auth/SocialLoginButtons";
+import { Text, Button, Input, Label } from "@/components/ui";
+import { loginSchema, type LoginInput } from "@/lib/validations/auth";
+import { apiPublicFetch } from "@/lib/api-client";
+import { parseApiError } from "@/lib/api-error";
+import { completeAuth } from "@/lib/auth-helpers";
+import {
+  getPendingInvitationToken,
+  clearPendingInvitationToken,
+} from "@/lib/storage";
+import { isTwoFactorChallenge, type LoginResponse } from "@/lib/types";
 
 export default function SignInScreen() {
   const { t } = useTranslation();
   const { theme } = useAppTheme();
   const router = useRouter();
-  const [serverError, setServerError] = useState('');
+  const [serverError, setServerError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -38,12 +41,15 @@ export default function SignInScreen() {
     formState: { errors },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: "", password: "" },
   });
 
   async function handleSocialLoginResponse(response: Response) {
     if (!response.ok) {
-      const error = await parseApiError(response, t('errorState.genericDescription'));
+      const error = await parseApiError(
+        response,
+        t("errorState.genericDescription"),
+      );
       setServerError(error);
       return;
     }
@@ -52,10 +58,10 @@ export default function SignInScreen() {
 
     if (isTwoFactorChallenge(result)) {
       router.push({
-        pathname: '/(auth)/verify-2fa',
+        pathname: "/(auth)/verify-2fa",
         params: {
           challengeToken: result.challengeToken,
-          methods: result.methods.join(','),
+          methods: result.methods.join(","),
           expiresAt: result.expiresAt,
         },
       });
@@ -69,17 +75,17 @@ export default function SignInScreen() {
     if (pendingToken) {
       await clearPendingInvitationToken();
       router.replace({
-        pathname: '/(auth)/accept-invitation',
+        pathname: "/(auth)/accept-invitation",
         params: { token: pendingToken },
       });
       return;
     }
 
-    router.replace('/(app)/(tabs)/dashboard');
+    router.replace("/(app)/(tabs)/dashboard");
   }
 
   async function handleGoogleSignIn() {
-    setServerError('');
+    setServerError("");
     setIsLoading(true);
     try {
       await GoogleSignin.hasPlayServices();
@@ -88,23 +94,29 @@ export default function SignInScreen() {
       if (!idToken) return;
 
       // Field name `idToken` matches api-nest GoogleLoginDto (auth.dto.ts)
-      const response = await apiPublicFetch('/auth/google', {
-        method: 'POST',
+      const response = await apiPublicFetch("/auth/google", {
+        method: "POST",
         body: JSON.stringify({ idToken }),
       });
       await handleSocialLoginResponse(response);
     } catch (error: unknown) {
       // User cancelled — not an error
-      if (error && typeof error === 'object' && 'code' in error && error.code === 'SIGN_IN_CANCELLED') return;
-      setServerError(t('errorState.genericDescription'));
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        error.code === "SIGN_IN_CANCELLED"
+      )
+        return;
+      setServerError(t("errorState.genericDescription"));
     } finally {
       setIsLoading(false);
     }
   }
 
   async function handleAppleSignIn() {
-    if (Platform.OS !== 'ios') return;
-    setServerError('');
+    if (Platform.OS !== "ios") return;
+    setServerError("");
     setIsLoading(true);
     try {
       const credential = await AppleAuthentication.signInAsync({
@@ -117,8 +129,8 @@ export default function SignInScreen() {
       if (!credential.identityToken) return;
 
       // Field names `identityToken` + `user.firstName/lastName` match api-nest AppleLoginDto (auth.dto.ts)
-      const response = await apiPublicFetch('/auth/apple', {
-        method: 'POST',
+      const response = await apiPublicFetch("/auth/apple", {
+        method: "POST",
         body: JSON.stringify({
           identityToken: credential.identityToken,
           user: {
@@ -130,25 +142,31 @@ export default function SignInScreen() {
       await handleSocialLoginResponse(response);
     } catch (error: unknown) {
       // User cancelled — not an error
-      if (error && typeof error === 'object' && 'code' in error && error.code === 'ERR_REQUEST_CANCELED') return;
-      setServerError(t('errorState.genericDescription'));
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        error.code === "ERR_REQUEST_CANCELED"
+      )
+        return;
+      setServerError(t("errorState.genericDescription"));
     } finally {
       setIsLoading(false);
     }
   }
 
   async function onSubmit(data: LoginInput) {
-    setServerError('');
+    setServerError("");
     setIsLoading(true);
     try {
-      const response = await apiPublicFetch('/auth/login', {
-        method: 'POST',
+      const response = await apiPublicFetch("/auth/login", {
+        method: "POST",
         body: JSON.stringify(data),
       });
       await handleSocialLoginResponse(response);
     } catch (error) {
-      console.error('Login network error:', error);
-      setServerError(t('errorState.genericDescription'));
+      console.error("Login network error:", error);
+      setServerError(t("errorState.genericDescription"));
     } finally {
       setIsLoading(false);
     }
@@ -159,18 +177,18 @@ export default function SignInScreen() {
       <BrandHeader />
 
       <View style={{ gap: theme.spacing.sm }}>
-        <Text variant="h2">{t('auth.welcomeBack')}</Text>
+        <Text variant="h2">{t("auth.welcomeBack")}</Text>
         <Text variant="bodySmall" color={theme.colors.mutedForeground}>
-          {t('auth.signInDescription')}
+          {t("auth.signInDescription")}
         </Text>
       </View>
 
-      {serverError !== '' && (
+      {serverError !== "" && (
         <View
           style={[
             styles.errorBanner,
             {
-              backgroundColor: theme.colors.destructive + '15',
+              backgroundColor: theme.colors.destructive + "15",
               borderRadius: theme.radii.md,
               marginTop: theme.spacing.md,
             },
@@ -185,7 +203,7 @@ export default function SignInScreen() {
       <View style={{ gap: theme.spacing.md, marginTop: theme.spacing.lg }}>
         {/* Email */}
         <View style={{ gap: theme.spacing.xs }}>
-          <Label>{t('auth.emailAddress')}</Label>
+          <Label>{t("auth.emailAddress")}</Label>
           <Controller
             name="email"
             control={control}
@@ -199,7 +217,7 @@ export default function SignInScreen() {
                 autoCapitalize="none"
                 autoComplete="email"
                 autoCorrect={false}
-                placeholder={t('auth.emailPlaceholder')}
+                placeholder={t("auth.emailPlaceholder")}
                 editable={!isLoading}
               />
             )}
@@ -214,11 +232,11 @@ export default function SignInScreen() {
         {/* Password */}
         <View style={{ gap: theme.spacing.xs }}>
           <View style={styles.passwordHeader}>
-            <Label>{t('auth.password')}</Label>
+            <Label>{t("auth.password")}</Label>
             <Link href="/(auth)/forgot-password" asChild>
               <Pressable hitSlop={8}>
                 <Text variant="bodySmall" color={theme.colors.primary}>
-                  {t('auth.forgotPassword')}
+                  {t("auth.forgotPassword")}
                 </Text>
               </Pressable>
             </Link>
@@ -233,7 +251,7 @@ export default function SignInScreen() {
                 onBlur={onBlur}
                 error={!!errors.password}
                 autoComplete="current-password"
-                placeholder={t('auth.passwordPlaceholder')}
+                placeholder={t("auth.passwordPlaceholder")}
                 editable={!isLoading}
               />
             )}
@@ -252,7 +270,7 @@ export default function SignInScreen() {
           onPress={handleSubmit(onSubmit)}
           style={{ marginTop: theme.spacing.xs }}
         >
-          {t('auth.signIn')}
+          {t("auth.signIn")}
         </Button>
       </View>
 
@@ -268,12 +286,12 @@ export default function SignInScreen() {
       {/* Footer */}
       <View style={[styles.footer, { marginTop: theme.spacing.lg }]}>
         <Text variant="bodySmall" color={theme.colors.mutedForeground}>
-          {t('auth.noAccount')}{' '}
+          {t("auth.noAccount")}{" "}
         </Text>
         <Link href="/(auth)/register" asChild>
           <Pressable hitSlop={8}>
             <Text variant="bodySmall" color={theme.colors.primary}>
-              {t('auth.createOne')}
+              {t("auth.createOne")}
             </Text>
           </Pressable>
         </Link>
@@ -284,16 +302,16 @@ export default function SignInScreen() {
 
 const styles = StyleSheet.create({
   passwordHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   errorBanner: {
     padding: 12,
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
