@@ -1,4 +1,4 @@
-import { View, Pressable, StyleSheet, ScrollView } from 'react-native';
+import { View, Pressable, StyleSheet, ScrollView, InteractionManager } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -42,8 +42,8 @@ export default function ThemeScreen() {
   const setColorScheme = useUIStore((s) => s.setColorScheme);
 
   function handleSelect(value: ColorSchemePreference) {
-    setColorScheme(value);
     router.back();
+    InteractionManager.runAfterInteractions(() => setColorScheme(value));
   }
 
   return (

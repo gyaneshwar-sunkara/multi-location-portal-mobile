@@ -1,4 +1,4 @@
-import { View, Pressable, StyleSheet, ScrollView } from 'react-native';
+import { View, Pressable, StyleSheet, ScrollView, InteractionManager } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,8 +22,8 @@ export default function LanguageScreen() {
   const setLanguage = useUIStore((s) => s.setLanguage);
 
   function handleSelect(lang: Language) {
-    setLanguage(lang);
     router.back();
+    InteractionManager.runAfterInteractions(() => setLanguage(lang));
   }
 
   return (
