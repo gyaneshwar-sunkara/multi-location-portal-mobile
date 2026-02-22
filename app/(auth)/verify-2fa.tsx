@@ -85,7 +85,7 @@ export default function Verify2faScreen() {
       });
       return;
     }
-    router.replace('/(app)');
+    router.replace('/(app)/(tabs)/dashboard');
   }
 
   // Redirect if no challenge token

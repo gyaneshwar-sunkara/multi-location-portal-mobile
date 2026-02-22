@@ -1,7 +1,6 @@
 import '@/i18n';
 import 'react-native-reanimated';
 
-import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -34,12 +33,6 @@ export default function RootLayout() {
 
 function RootNavigator() {
   const isHydrated = useAuthStore((s) => s.isHydrated);
-
-  useEffect(() => {
-    if (isHydrated) {
-      SplashScreen.hideAsync();
-    }
-  }, [isHydrated]);
 
   if (!isHydrated) return null;
 

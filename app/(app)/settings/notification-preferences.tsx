@@ -25,11 +25,14 @@ export default function NotificationPreferencesScreen() {
   const { theme } = useAppTheme();
   const queryClient = useQueryClient();
 
-  const { data: preferences, isLoading, isError, refetch } = useQuery({
+  const { data: preferences, isLoading, isError, error, refetch } = useQuery({
     queryKey: qk.notificationsPreferences,
     queryFn: async () => {
       const res = await apiFetch('/notifications/preferences');
-      if (!res.ok) throw new Error('Failed to fetch preferences');
+      if (!res.ok) {
+        const message = await parseApiError(res);
+        throw new Error(message);
+      }
       return res.json() as Promise<NotificationPreferences>;
     },
   });
@@ -85,7 +88,7 @@ export default function NotificationPreferencesScreen() {
   }
 
   if (isError) {
-    return <ErrorState onRetry={() => refetch()} />;
+    return <ErrorState message={error?.message} onRetry={() => refetch()} />;
   }
 
   function renderSection(title: string, items: ToggleItem[]) {

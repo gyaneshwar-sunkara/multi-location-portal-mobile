@@ -134,10 +134,14 @@ function makeAuthenticatedRequest(
     headers['x-organization-id'] = activeOrganizationId;
   }
 
-  // Use caller's signal if provided, otherwise apply default timeout
-  const signal = options.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+  // Create timeout signal for React Native compatibility
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  
+  // Use caller's signal if provided, otherwise use our timeout controller
+  const signal = options.signal ?? controller.signal;
 
-  return fetch(`${API_URL}${path}`, {
+  const fetchPromise = fetch(`${API_URL}${path}`, {
     ...options,
     signal,
     headers: {
@@ -145,6 +149,11 @@ function makeAuthenticatedRequest(
       ...toHeadersRecord(options.headers),
     },
   });
+
+  // Clear timeout on completion
+  fetchPromise.finally(() => clearTimeout(timeoutId));
+  
+  return fetchPromise;
 }
 
 // ── Public Fetch ────────────────────────────────────────────────────────────
@@ -159,16 +168,28 @@ export async function apiPublicFetch(
 ): Promise<Response> {
   const { language } = useUIStore.getState();
 
-  // Use caller's signal if provided, otherwise apply default timeout
-  const signal = options.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+  // Create timeout signal for React Native compatibility
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  
+  // Use caller's signal if provided, otherwise use our timeout controller
+  const signal = options.signal ?? controller.signal;
 
-  return fetch(`${API_URL}${path}`, {
-    ...options,
-    signal,
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept-Language': language,
-      ...toHeadersRecord(options.headers),
-    },
-  });
+  try {
+    const response = await fetch(`${API_URL}${path}`, {
+      ...options,
+      signal,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-Language': language,
+        ...toHeadersRecord(options.headers),
+      },
+    });
+    
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
 }

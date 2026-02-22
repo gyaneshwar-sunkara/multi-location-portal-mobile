@@ -37,7 +37,7 @@ export default function ResetPasswordScreen() {
 
   // Redirect authenticated users to the app home screen
   if (isAuthenticated) {
-    return <Redirect href="/(app)" />;
+    return <Redirect href="/(app)/(tabs)/dashboard" />;
   }
 
   const [serverError, setServerError] = useState('');

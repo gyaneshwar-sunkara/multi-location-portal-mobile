@@ -49,6 +49,7 @@ export default function NotificationsScreen() {
     data,
     isLoading,
     isError,
+    error,
     isRefetching,
     refetch,
     fetchNextPage,
@@ -60,7 +61,10 @@ export default function NotificationsScreen() {
       const res = await apiFetch(
         `/notifications?skip=${pageParam}&take=${PAGE_SIZE}`,
       );
-      if (!res.ok) throw new Error('Failed to fetch notifications');
+      if (!res.ok) {
+        const message = await parseApiError(res);
+        throw new Error(message);
+      }
       return res.json() as Promise<{
         data: Notification[];
         total: number;
@@ -288,7 +292,7 @@ export default function NotificationsScreen() {
   if (isError) {
     return (
       <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-        <ErrorState onRetry={() => refetch()} />
+        <ErrorState message={error?.message} onRetry={() => refetch()} />
       </SafeAreaView>
     );
   }

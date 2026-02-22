@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as SplashScreen from 'expo-splash-screen';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,6 +25,7 @@ import {
 } from '@/components/ui';
 import { ErrorState } from '@/components/ErrorState';
 import { apiFetch } from '@/lib/api-client';
+import { parseApiError } from '@/lib/api-error';
 import { getInitials } from '@/lib/format';
 import { qk } from '@/lib/query-keys';
 import type { MeResponse } from '@/lib/types';
@@ -37,6 +39,10 @@ export default function DashboardScreen() {
 
   const setActiveOrganization = useAuthStore((s) => s.setActiveOrganization);
 
+  useEffect(() => {
+    SplashScreen.hideAsync();
+  }, []);
+
   const activeOrg = memberships.find(
     (m) => m.organizationId === activeOrganizationId,
   );
@@ -45,13 +51,17 @@ export default function DashboardScreen() {
     data: me,
     isLoading,
     isError,
+    error,
     isRefetching,
     refetch,
   } = useQuery({
     queryKey: qk.authMe,
     queryFn: async () => {
       const res = await apiFetch('/auth/me');
-      if (!res.ok) throw new Error('Failed to fetch profile');
+      if (!res.ok) {
+        const message = await parseApiError(res);
+        throw new Error(message);
+      }
       return (await res.json()) as MeResponse;
     },
   });
@@ -121,7 +131,7 @@ export default function DashboardScreen() {
   if (isError) {
     return (
       <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-        <ErrorState onRetry={() => refetch()} />
+        <ErrorState message={error?.message} onRetry={() => refetch()} />
       </SafeAreaView>
     );
   }

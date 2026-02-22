@@ -136,7 +136,7 @@ export default function AcceptInvitationScreen() {
           </Text>
           <Button
             size="lg"
-            onPress={() => router.replace('/(app)')}
+            onPress={() => router.replace('/(app)/(tabs)/dashboard')}
             style={{ marginTop: theme.spacing.sm, alignSelf: 'stretch' }}
           >
             {t('auth.goToDashboard')}

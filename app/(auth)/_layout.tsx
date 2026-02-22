@@ -12,7 +12,7 @@ export default function AuthLayout() {
 
   // Redirect authenticated users to the app
   if (isHydrated && isAuthenticated) {
-    return <Redirect href="/(app)" />;
+    return <Redirect href="/(app)/(tabs)/dashboard" />;
   }
 
   return (

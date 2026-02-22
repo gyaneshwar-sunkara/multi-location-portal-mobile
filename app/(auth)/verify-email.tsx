@@ -154,7 +154,7 @@ export default function VerifyEmailScreen() {
           <Button
             size="lg"
             onPress={() =>
-              router.replace(isAuthenticated ? '/(app)' : '/(auth)/sign-in')
+              router.replace(isAuthenticated ? '/(app)/(tabs)/dashboard' : '/(auth)/sign-in')
             }
             style={{ marginTop: theme.spacing.sm, alignSelf: 'stretch' }}
           >

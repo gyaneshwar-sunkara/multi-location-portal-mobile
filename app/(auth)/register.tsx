@@ -84,7 +84,7 @@ export default function RegisterScreen() {
       return;
     }
 
-    router.replace('/(app)');
+    router.replace('/(app)/(tabs)/dashboard');
   }
 
   async function handleGoogleSignIn() {

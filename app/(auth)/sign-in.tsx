@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Pressable, Platform, StyleSheet } from 'react-native';
+import * as SplashScreen from 'expo-splash-screen';
 import { useRouter, Link } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,6 +27,10 @@ export default function SignInScreen() {
   const router = useRouter();
   const [serverError, setServerError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    SplashScreen.hideAsync();
+  }, []);
 
   const {
     control,
@@ -70,7 +75,7 @@ export default function SignInScreen() {
       return;
     }
 
-    router.replace('/(app)');
+    router.replace('/(app)/(tabs)/dashboard');
   }
 
   async function handleGoogleSignIn() {
@@ -141,7 +146,8 @@ export default function SignInScreen() {
         body: JSON.stringify(data),
       });
       await handleSocialLoginResponse(response);
-    } catch {
+    } catch (error) {
+      console.error('Login network error:', error);
       setServerError(t('errorState.genericDescription'));
     } finally {
       setIsLoading(false);
