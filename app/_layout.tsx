@@ -3,6 +3,7 @@ import 'react-native-reanimated';
 
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -13,6 +14,10 @@ import { AuthProvider } from '@/providers/auth-provider';
 import { OfflineBanner } from '@/components/OfflineBanner';
 
 export { ErrorBoundary } from 'expo-router';
+
+GoogleSignin.configure({
+  webClientId: process.env['EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID'],
+});
 
 SplashScreen.preventAutoHideAsync();
 
