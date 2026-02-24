@@ -166,7 +166,7 @@ function makeAuthenticatedRequest(
 
 /**
  * Fetch from the api-nest backend without authentication (for public endpoints).
- * Only attaches Accept-Language header. Used for login, register, forgot-password, etc.
+ * Only attaches Accept-Language header. Used for login, forgot-password, etc.
  */
 export async function apiPublicFetch(
   path: string,

@@ -1,6 +1,5 @@
 export {
   loginSchema,
-  registerSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
   verifyEmailSchema,
@@ -11,7 +10,6 @@ export {
 } from './auth'
 export type {
   LoginInput,
-  RegisterInput,
   ForgotPasswordInput,
   ResetPasswordInput,
   VerifyEmailInput,

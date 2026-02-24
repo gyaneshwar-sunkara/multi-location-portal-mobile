@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useAppTheme } from '@/providers/theme-provider';
 import { useAuthStore } from '@/stores/auth-store';
-import { Text, Button } from '@/components/ui';
+import { Text } from '@/components/ui';
 import { refreshMemberships } from '@/lib/auth-helpers';
 
 const AVATAR_COLORS = [
@@ -73,15 +73,8 @@ export default function OrgSwitchScreen() {
           color={theme.colors.mutedForeground}
           style={styles.textCenter}
         >
-          {t('common.organizations')}
+          {t('org.noOrganizations')}
         </Text>
-        <Button
-          variant="outline"
-          size="lg"
-          onPress={() => router.push('/(app)/org/create')}
-        >
-          {t('org.createOrganization')}
-        </Button>
       </View>
     );
   }
@@ -175,15 +168,6 @@ export default function OrgSwitchScreen() {
         })}
       </View>
 
-      {/* Create Organization Button */}
-      <Button
-        variant="outline"
-        size="lg"
-        onPress={() => router.push('/(app)/org/create')}
-        style={{ marginTop: theme.spacing.sm }}
-      >
-        {t('org.createOrganization')}
-      </Button>
     </ScrollView>
   );
 }

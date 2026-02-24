@@ -34,8 +34,7 @@ app/
 ├── +not-found.tsx           # 404 screen
 ├── (auth)/
 │   ├── _layout.tsx          # Auth stack navigator (public screens, no header)
-│   ├── sign-in.tsx          # Email + password + social login (Google/Apple), 2FA branching
-│   ├── register.tsx         # Registration with password requirements + social login
+│   ├── sign-in.tsx          # Email + password login, 2FA branching
 │   ├── forgot-password.tsx  # Request password reset → success state
 │   ├── verify-2fa.tsx       # OTP verification (TOTP/email/SMS) + recovery codes
 │   ├── reset-password.tsx   # Set new password (from deep link)
@@ -61,7 +60,7 @@ lib/
 ├── query-keys.ts            # Query key factory: qk.authMe, qk.organizationsList, etc.
 └── validations/
     ├── index.ts             # Barrel re-export
-    ├── auth.ts              # Zod schemas: login, register, forgotPassword, verify2fa, etc.
+    ├── auth.ts              # Zod schemas: login, forgotPassword, verify2fa, etc.
     └── settings.ts          # Zod schemas: updateProfile, changePassword, deleteAccount, etc.
 stores/
 ├── auth-store.ts            # Zustand: user, tokens, memberships, activeOrgId (SecureStore + MMKV)
@@ -75,8 +74,7 @@ hooks/
 components/
 ├── auth/
 │   ├── AuthScreenLayout.tsx  # Shared wrapper: SafeAreaView + KeyboardAvoidingView + ScrollView
-│   ├── PasswordInput.tsx     # Password field with show/hide eye icon toggle
-│   └── SocialLoginButtons.tsx # Google + Apple sign-in buttons with divider
+│   └── PasswordInput.tsx     # Password field with show/hide eye icon toggle
 ├── ui/
 │   ├── Text.tsx             # Themed text with variant prop (h1/h2/h3/body/bodySmall/caption/label)
 │   ├── Button.tsx           # Themed button (default/secondary/destructive/outline/ghost, loading)
@@ -113,12 +111,11 @@ theme/
 - `auth-helpers.ts` — `refreshMemberships()` re-fetches `/auth/me` and updates memberships in store (used after accepting invitations)
 - `providers/auth-provider.tsx` — `useAuth()` returns `{ isAuthenticated, isLoading, user, logout }`
 - Splash screen gates on `isHydrated` — no flash of wrong screen
-- **Social login:** Google via `@react-native-google-signin/google-signin`, Apple via `expo-apple-authentication` (iOS only). Both call `/auth/google` or `/auth/apple`, return same `LoginResponse` as email login (may trigger 2FA)
 
 ### API Client
 
 - `apiFetch(path, options)` — attaches Bearer token, Accept-Language, x-organization-id. Auto-refreshes tokens (proactive 60s buffer + reactive 401 retry). Refresh mutex prevents concurrent refresh calls.
-- `apiPublicFetch(path, options)` — no auth. Used for login, register, forgot-password, 2FA endpoints.
+- `apiPublicFetch(path, options)` — no auth. Used for login, forgot-password, 2FA endpoints.
 - Both prepend `API_URL` from `lib/config.ts` and accept standard `RequestInit` options.
 
 ### Forms & Validation
@@ -199,4 +196,4 @@ Platform-aware dev fallback: iOS uses `localhost`, Android uses `10.0.2.2` (emul
 
 ## Zod v4 Notes
 
-portal-mobile uses Zod v4 (4.3.6) while portal-web uses Zod v3. Only breaking change encountered: `z.literal(true, { errorMap })` → `z.literal(true, { error })` in registerSchema terms field. All other APIs are v3/v4 compatible.
+portal-mobile uses Zod v4 (4.3.6) while portal-web uses Zod v3. All APIs used are v3/v4 compatible.

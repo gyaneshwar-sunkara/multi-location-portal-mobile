@@ -1,6 +1,5 @@
 import {
   loginSchema,
-  registerSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
   verifyEmailSchema,
@@ -28,56 +27,6 @@ describe('loginSchema', () => {
 
   it('rejects missing fields', () => {
     const result = loginSchema.safeParse({});
-    expect(result.success).toBe(false);
-  });
-});
-
-describe('registerSchema', () => {
-  const validData = {
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john@example.com',
-    password: 'StrongPass1',
-    terms: true,
-  };
-
-  it('accepts valid registration data', () => {
-    const result = registerSchema.safeParse(validData);
-    expect(result.success).toBe(true);
-  });
-
-  it('rejects password without uppercase', () => {
-    const result = registerSchema.safeParse({ ...validData, password: 'weakpass1' });
-    expect(result.success).toBe(false);
-  });
-
-  it('rejects password without lowercase', () => {
-    const result = registerSchema.safeParse({ ...validData, password: 'WEAKPASS1' });
-    expect(result.success).toBe(false);
-  });
-
-  it('rejects password without number', () => {
-    const result = registerSchema.safeParse({ ...validData, password: 'WeakPasss' });
-    expect(result.success).toBe(false);
-  });
-
-  it('rejects password shorter than 8 characters', () => {
-    const result = registerSchema.safeParse({ ...validData, password: 'Pass1' });
-    expect(result.success).toBe(false);
-  });
-
-  it('rejects when terms is false', () => {
-    const result = registerSchema.safeParse({ ...validData, terms: false });
-    expect(result.success).toBe(false);
-  });
-
-  it('rejects empty first name', () => {
-    const result = registerSchema.safeParse({ ...validData, firstName: '' });
-    expect(result.success).toBe(false);
-  });
-
-  it('rejects firstName exceeding 50 characters', () => {
-    const result = registerSchema.safeParse({ ...validData, firstName: 'A'.repeat(51) });
     expect(result.success).toBe(false);
   });
 });

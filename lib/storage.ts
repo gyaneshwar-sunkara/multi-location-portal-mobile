@@ -30,7 +30,7 @@ export async function getOrCreateDeviceId(): Promise<string> {
 
 // ── Pending Invitation Token ────────────────────────────────────────────────
 // Stored when an unauthenticated user taps an invitation deep link.
-// After sign-in/register succeeds, the app checks for this and redirects
+// After sign-in succeeds, the app checks for this and redirects
 // to the accept-invitation screen instead of the dashboard.
 // Stored in SecureStore for better security (invitation tokens are sensitive).
 

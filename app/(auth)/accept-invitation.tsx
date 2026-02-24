@@ -258,27 +258,15 @@ export default function AcceptInvitationScreen() {
             {t('auth.acceptInvitation')}
           </Button>
         ) : (
-          <>
-            <Button
-              size="lg"
-              onPress={async () => {
-                if (token) await setPendingInvitationToken(token);
-                router.replace('/(auth)/sign-in');
-              }}
-            >
-              {t('auth.signInToAccept')}
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onPress={async () => {
-                if (token) await setPendingInvitationToken(token);
-                router.push('/(auth)/register');
-              }}
-            >
-              {t('auth.createAccountToAccept')}
-            </Button>
-          </>
+          <Button
+            size="lg"
+            onPress={async () => {
+              if (token) await setPendingInvitationToken(token);
+              router.replace('/(auth)/sign-in');
+            }}
+          >
+            {t('auth.signInToAccept')}
+          </Button>
         )}
       </View>
     </AuthScreenLayout>

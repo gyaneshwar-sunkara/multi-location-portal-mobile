@@ -75,10 +75,6 @@ export default function AppLayout() {
         options={{ title: t('common.switchOrganization'), headerBackTitle: t('common.settings') }}
       />
       <Stack.Screen
-        name="org/create"
-        options={{ title: t('org.createOrganization'), presentation: 'modal' }}
-      />
-      <Stack.Screen
         name="admin/dashboard"
         options={{ title: t('admin.title'), headerBackTitle: t('common.settings') }}
       />

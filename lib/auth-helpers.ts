@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import type { AuthResponse, MeResponse } from '@/lib/types';
 
 /**
- * Complete the authentication flow after login/register/2FA verify.
+ * Complete the authentication flow after login/2FA verify.
  * Fetches /auth/me for memberships, then persists everything to auth store.
  */
 export async function completeAuth(authResponse: AuthResponse): Promise<void> {
